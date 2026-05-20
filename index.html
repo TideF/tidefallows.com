@@ -4,280 +4,287 @@
 <meta charset="UTF-8">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #000;
-    overflow: hidden;
-    width: 100vw;
-    height: 100vh;
-    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
-  }
-  canvas#bg {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-  }
-  .earth {
-    position: fixed;
-    bottom: -38%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90vmin;
-    height: 90vmin;
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at 25% 25%, rgba(255,255,255,0.12) 0%, transparent 14%),
-      radial-gradient(ellipse at 55% 35%, #3a9a5c 0%, #3a9a5c 12%, transparent 13%),
-      radial-gradient(ellipse at 22% 52%, #2d8a4e 0%, #2d8a4e 9%, transparent 10%),
-      radial-gradient(ellipse at 78% 62%, #2d8a4e 0%, #2d8a4e 11%, transparent 12%),
-      radial-gradient(ellipse at 48% 78%, #3a9a5c 0%, #3a9a5c 7%, transparent 8%),
-      radial-gradient(ellipse at 82% 22%, #2d8a4e 0%, #2d8a4e 5%, transparent 6%),
-      radial-gradient(ellipse at 15% 75%, #2d8a4e 0%, #2d8a4e 6%, transparent 7%),
-      linear-gradient(135deg, #1e7ecf 0%, #1a5a9e 45%, #0d3d6e 100%);
-    box-shadow:
-      0 0 80px rgba(30, 110, 220, 0.6),
-      0 0 160px rgba(10, 60, 150, 0.3),
-      inset -25px -25px 70px rgba(0, 0, 40, 0.75),
-      inset 8px 8px 40px rgba(120, 190, 255, 0.08);
-    z-index: 2;
-  }
-  .atmosphere {
-    position: fixed;
-    bottom: -38%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(90vmin + 40px);
-    height: calc(90vmin + 40px);
-    border-radius: 50%;
-    background: radial-gradient(circle at center,
-      transparent 46%,
-      rgba(100, 180, 255, 0.06) 48%,
-      rgba(80, 150, 255, 0.12) 50%,
-      rgba(60, 120, 220, 0.08) 52%,
-      transparent 55%
-    );
-    z-index: 3;
-    pointer-events: none;
-  }
-  .title-container {
-    position: fixed;
-    top: 32%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 10;
-  }
-  h1 {
-    font-size: clamp(2.2rem, 5.5vw, 5rem);
-    color: #fff;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    font-weight: 300;
-    text-shadow:
-      0 0 8px rgba(180, 220, 255, 1),
-      0 0 25px rgba(120, 180, 255, 0.9),
-      0 0 55px rgba(80, 145, 255, 0.6),
-      0 0 100px rgba(50, 110, 255, 0.35);
-  }
-  .subtitle {
-    margin-top: 10px;
-    font-size: clamp(0.7rem, 1.5vw, 1rem);
-    color: rgba(180, 220, 255, 0.6);
-    letter-spacing: 0.6em;
-    text-transform: uppercase;
-    font-weight: 300;
-  }
+  body { background: #000; overflow: hidden; width: 100vw; height: 100vh; font-family: 'Palatino Linotype', Georgia, serif; }
+  #bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
+  #earth { position: fixed; bottom: -38%; left: 50%; transform: translateX(-50%); width: 90vmin; height: 90vmin; z-index: 2; }
+  .title-container { position: fixed; top: 32%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10; }
+  h1 { font-size: clamp(2.2rem, 5.5vw, 5rem); color: #fff; letter-spacing: 0.35em; text-transform: uppercase; font-weight: 300;
+    text-shadow: 0 0 8px rgba(180,220,255,1), 0 0 25px rgba(120,180,255,.9), 0 0 55px rgba(80,145,255,.6), 0 0 100px rgba(50,110,255,.35); }
+  .subtitle { margin-top: 10px; font-size: clamp(.7rem, 1.5vw, 1rem); color: rgba(180,220,255,.6); letter-spacing: .6em; text-transform: uppercase; font-weight: 300; }
 </style>
 </head>
 <body>
-  <canvas id="bg"></canvas>
-  <div class="earth"></div>
-  <div class="atmosphere"></div>
-  <div class="title-container">
-    <h1>Project Atlas</h1>
-    <p class="subtitle">A New World Awaits</p>
-  </div>
+<canvas id="bg"></canvas>
+<canvas id="earth"></canvas>
+<div class="title-container">
+  <h1>Project Atlas</h1>
+  <p class="subtitle">A New World Awaits</p>
+</div>
+<script>
+// ── BACKGROUND ───────────────────────────────────────────────────────────────
+const bgC = document.getElementById('bg');
+const bgX = bgC.getContext('2d');
+function resizeBg() { bgC.width = innerWidth; bgC.height = innerHeight; }
+resizeBg(); window.addEventListener('resize', resizeBg);
 
-  <script>
-    const canvas = document.getElementById('bg');
-    const ctx = canvas.getContext('2d');
+const stars = Array.from({length:500}, () => ({
+  x:Math.random(), y:Math.random(), r:Math.random()*1.4+0.1,
+  a:Math.random()*.7+.3, da:(Math.random()*.004+.001)*(Math.random()>.5?1:-1)
+}));
 
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+function drawSun(w,h) {
+  const sx=w*.93, sy=h*-.06, sr=Math.min(w,h)*.22;
+  [[sr*3.5,.03],[sr*2.5,.06],[sr*1.8,.12],[sr*1.2,.25]].forEach(([r,a]) => {
+    const g=bgX.createRadialGradient(sx,sy,0,sx,sy,r);
+    g.addColorStop(0,`rgba(255,190,40,${a})`); g.addColorStop(1,'transparent');
+    bgX.fillStyle=g; bgX.fillRect(0,0,w,h);
+  });
+  const sg=bgX.createRadialGradient(sx*.96,sy*.8,0,sx,sy,sr);
+  sg.addColorStop(0,'#ffffdd'); sg.addColorStop(.25,'#ffee55');
+  sg.addColorStop(.6,'#ffaa00'); sg.addColorStop(.85,'#ff7700'); sg.addColorStop(1,'#cc4400');
+  bgX.beginPath(); bgX.arc(sx,sy,sr,0,Math.PI*2); bgX.fillStyle=sg; bgX.fill();
+}
+
+const planets = [
+  {rx:.13,ry:.055,T:7,   s:3,  c:'#a8a8a8', ph:.4},
+  {rx:.21,ry:.09, T:12,  s:5,  c:'#d4b483', ph:1.8},
+  {rx:.35,ry:.15, T:28,  s:4,  c:'#c1440e', ph:3.2, moons:1},
+  {rx:.52,ry:.22, T:65,  s:11, c:'#c8823a', ph:5.1, bands:true},
+  {rx:.68,ry:.28, T:100, s:9,  c:'#e0d08a', ph:1.3, rings:true},
+  {rx:.82,ry:.34, T:140, s:7,  c:'#7ec8e3', ph:4.6},
+  {rx:.96,ry:.40, T:200, s:7,  c:'#4b70dd', ph:2.2},
+];
+function shade(hex,a){const n=parseInt(hex.replace('#',''),16);return `rgb(${Math.max(0,Math.min(255,(n>>16)+a))},${Math.max(0,Math.min(255,((n>>8)&255)+a))},${Math.max(0,Math.min(255,(n&255)+a))})`;}
+
+let bgT=0;
+function drawBg() {
+  const w=bgC.width, h=bgC.height;
+  bgX.clearRect(0,0,w,h);
+  bgX.fillStyle='#00000c'; bgX.fillRect(0,0,w,h);
+  const nb=bgX.createRadialGradient(w*.25,h*.45,0,w*.25,h*.45,w*.55);
+  nb.addColorStop(0,'rgba(15,25,70,.28)'); nb.addColorStop(1,'transparent');
+  bgX.fillStyle=nb; bgX.fillRect(0,0,w,h);
+
+  stars.forEach(s=>{
+    s.a+=s.da;
+    if(s.a>1){s.a=1;s.da=-Math.abs(s.da);} if(s.a<.15){s.a=.15;s.da=Math.abs(s.da);}
+    bgX.beginPath(); bgX.arc(s.x*w,s.y*h,s.r,0,Math.PI*2);
+    bgX.fillStyle=`rgba(255,255,255,${s.a.toFixed(2)})`; bgX.fill();
+  });
+
+  drawSun(w,h);
+  const cx=w*.93, cy=h*-.06;
+  planets.forEach(p=>{
+    const rx=p.rx*w, ry=p.ry*h;
+    bgX.beginPath(); bgX.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+    bgX.strokeStyle='rgba(255,255,255,.07)'; bgX.lineWidth=1; bgX.stroke();
+    const ang=p.ph+bgT/p.T, px=cx+Math.cos(ang)*rx, py=cy+Math.sin(ang)*ry;
+    if(p.rings){
+      bgX.save(); bgX.translate(px,py); bgX.scale(1,.32);
+      bgX.beginPath(); bgX.arc(0,0,p.s*2.4,0,Math.PI*2); bgX.strokeStyle='rgba(224,208,138,.55)'; bgX.lineWidth=4; bgX.stroke();
+      bgX.beginPath(); bgX.arc(0,0,p.s*1.85,0,Math.PI*2); bgX.strokeStyle='rgba(224,208,138,.3)'; bgX.lineWidth=2.5; bgX.stroke();
+      bgX.restore();
     }
-    resize();
-    window.addEventListener('resize', resize);
-
-    // Stars
-    const NUM_STARS = 500;
-    const starData = Array.from({length: NUM_STARS}, () => ({
-      x: Math.random(),
-      y: Math.random(),
-      r: Math.random() * 1.4 + 0.1,
-      alpha: Math.random() * 0.7 + 0.3,
-      dAlpha: (Math.random() * 0.004 + 0.001) * (Math.random() > 0.5 ? 1 : -1)
-    }));
-
-    // Sun origin: top-right corner
-    const SUN_X = 0.93;
-    const SUN_Y = -0.06;
-
-    function drawSun(w, h) {
-      const sx = w * SUN_X, sy = h * SUN_Y;
-      const sr = Math.min(w, h) * 0.22;
-      // Outer glow layers
-      [[sr * 3.5, 0.03], [sr * 2.5, 0.06], [sr * 1.8, 0.12], [sr * 1.2, 0.25]].forEach(([r, a]) => {
-        const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, r);
-        g.addColorStop(0, `rgba(255,190,40,${a})`);
-        g.addColorStop(1, 'transparent');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, w, h);
-      });
-      // Sun body
-      const sg = ctx.createRadialGradient(sx * 0.96, sy * 0.8, 0, sx, sy, sr);
-      sg.addColorStop(0,   '#ffffdd');
-      sg.addColorStop(0.25,'#ffee55');
-      sg.addColorStop(0.6, '#ffaa00');
-      sg.addColorStop(0.85,'#ff7700');
-      sg.addColorStop(1,   '#cc4400');
-      ctx.beginPath();
-      ctx.arc(sx, sy, sr, 0, Math.PI * 2);
-      ctx.fillStyle = sg;
-      ctx.fill();
+    const pg=bgX.createRadialGradient(px-p.s*.35,py-p.s*.35,0,px,py,p.s);
+    pg.addColorStop(0,'rgba(255,255,255,.9)'); pg.addColorStop(.2,p.c); pg.addColorStop(1,shade(p.c,-60));
+    bgX.beginPath(); bgX.arc(px,py,p.s,0,Math.PI*2); bgX.fillStyle=pg; bgX.fill();
+    if(p.bands){
+      bgX.save(); bgX.beginPath(); bgX.arc(px,py,p.s,0,Math.PI*2); bgX.clip();
+      [-.35,-.1,.15,.4].forEach(o=>{bgX.fillStyle='rgba(160,80,20,.25)'; bgX.fillRect(px-p.s,py+o*p.s-1.5,p.s*2,2.5);});
+      bgX.restore();
     }
-
-    // Planets: orbitRx/Ry are fractions of canvas size; origin at SUN_X, SUN_Y
-    const planets = [
-      { orbitRx: 0.13, orbitRy: 0.055, period: 7,   size: 3,  color: '#a8a8a8', phase: 0.4  },
-      { orbitRx: 0.21, orbitRy: 0.09,  period: 12,  size: 5,  color: '#d4b483', phase: 1.8  },
-      { orbitRx: 0.35, orbitRy: 0.15,  period: 28,  size: 4,  color: '#c1440e', phase: 3.2, moons: 1 },
-      { orbitRx: 0.52, orbitRy: 0.22,  period: 65,  size: 11, color: '#c8823a', phase: 5.1, bands: true },
-      { orbitRx: 0.68, orbitRy: 0.28,  period: 100, size: 9,  color: '#e0d08a', phase: 1.3, rings: true },
-      { orbitRx: 0.82, orbitRy: 0.34,  period: 140, size: 7,  color: '#7ec8e3', phase: 4.6  },
-      { orbitRx: 0.96, orbitRy: 0.40,  period: 200, size: 7,  color: '#4b70dd', phase: 2.2  },
-    ];
-
-    function shade(hex, amt) {
-      const n = parseInt(hex.replace('#',''), 16);
-      const r = Math.max(0, Math.min(255, (n >> 16) + amt));
-      const g = Math.max(0, Math.min(255, ((n >> 8) & 0xff) + amt));
-      const b = Math.max(0, Math.min(255, (n & 0xff) + amt));
-      return `rgb(${r},${g},${b})`;
+    if(p.moons){
+      const ma=ang*6, mr=p.s*2.5;
+      bgX.beginPath(); bgX.arc(px+Math.cos(ma)*mr,py+Math.sin(ma)*mr*.5,1.5,0,Math.PI*2);
+      bgX.fillStyle='rgba(210,210,210,.85)'; bgX.fill();
     }
+  });
+  bgT+=.012; requestAnimationFrame(drawBg);
+}
+drawBg();
 
-    let t = 0;
-    function draw() {
-      const w = canvas.width, h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
+// ── EARTH ─────────────────────────────────────────────────────────────────────
+const eC = document.getElementById('earth');
+const eX = eC.getContext('2d');
+function resizeEarth() {
+  const sz = Math.min(innerWidth, innerHeight) * 0.9;
+  eC.width = sz; eC.height = sz;
+}
+resizeEarth(); window.addEventListener('resize', resizeEarth);
 
-      // Deep space background
-      ctx.fillStyle = '#00000c';
-      ctx.fillRect(0, 0, w, h);
+// Continent outlines as [lon, lat] geographic coordinates
+const LAND = [
+  // Africa
+  [[-6,36],[-2,35],[3,37],[9,37],[13,37],[18,34],[22,31],[26,31],[30,30],[32,28],[37,22],
+   [43,12],[51,11],[45,10],[44,4],[42,2],[40,-2],[39,-7],[35,-17],[34,-22],[32,-26],[28,-31],
+   [24,-34],[20,-35],[18,-34],[16,-29],[13,-24],[10,-18],[8,-10],[5,-5],[2,0],[1,5],[3,6],
+   [2,5],[-2,5],[-8,5],[-10,8],[-13,10],[-15,12],[-17,14],[-15,18],[-14,22],[-17,26],
+   [-13,28],[-8,29],[-3,32],[-2,33],[-6,36]],
 
-      // Subtle nebula
-      const nb = ctx.createRadialGradient(w*0.25, h*0.45, 0, w*0.25, h*0.45, w*0.55);
-      nb.addColorStop(0, 'rgba(15,25,70,0.28)');
-      nb.addColorStop(0.5, 'rgba(10,15,50,0.1)');
-      nb.addColorStop(1, 'transparent');
-      ctx.fillStyle = nb;
-      ctx.fillRect(0, 0, w, h);
+  // Europe
+  [[-9,36],[-6,36],[-2,33],[3,37],[6,44],[8,44],[12,44],[14,42],[16,38],[18,40],[20,38],
+   [22,37],[26,38],[28,36],[30,37],[36,37],[36,42],[38,45],[40,47],[36,48],[28,53],[24,55],
+   [18,57],[14,58],[10,58],[5,58],[0,56],[-5,56],[-8,52],[-10,48],[-9,44],[-9,40],[-9,36]],
 
-      const nb2 = ctx.createRadialGradient(w*0.7, h*0.2, 0, w*0.7, h*0.2, w*0.35);
-      nb2.addColorStop(0, 'rgba(40,10,60,0.15)');
-      nb2.addColorStop(1, 'transparent');
-      ctx.fillStyle = nb2;
-      ctx.fillRect(0, 0, w, h);
+  // Asia
+  [[36,37],[42,37],[45,40],[50,40],[55,42],[60,44],[65,42],[70,38],[72,25],[78,8],[80,12],
+   [85,22],[90,22],[95,18],[100,5],[104,1],[108,5],[110,10],[115,22],[120,25],[122,30],
+   [125,35],[128,38],[130,42],[135,45],[140,42],[142,47],[145,48],[140,55],[135,58],[140,65],
+   [140,72],[120,73],[100,73],[80,72],[72,72],[68,68],[58,68],[52,65],[48,58],[42,50],
+   [38,48],[34,48],[30,50],[28,53],[24,55],[18,57],[22,55],[28,53],[36,48],[40,47],[38,45],
+   [36,42],[36,37]],
 
-      // Stars
-      starData.forEach(s => {
-        s.alpha += s.dAlpha;
-        if (s.alpha > 1)   { s.alpha = 1;   s.dAlpha = -Math.abs(s.dAlpha); }
-        if (s.alpha < 0.15){ s.alpha = 0.15; s.dAlpha =  Math.abs(s.dAlpha); }
-        ctx.beginPath();
-        ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${s.alpha.toFixed(2)})`;
-        ctx.fill();
-      });
+  // North America
+  [[-168,72],[-140,70],[-120,60],[-130,56],[-126,50],[-124,42],[-120,38],[-117,32],
+   [-110,24],[-97,20],[-88,18],[-84,10],[-79,8],[-80,9],[-85,16],[-88,18],[-90,20],
+   [-87,22],[-95,25],[-97,20],[-110,24],[-120,38],[-124,42],[-124,48],[-130,56],
+   [-120,60],[-100,65],[-80,70],[-70,72],[-60,70],[-55,68],[-60,60],[-65,58],[-70,55],
+   [-73,50],[-65,45],[-60,47],[-65,52],[-70,55],[-75,52],[-82,43],[-80,44],[-76,44],
+   [-75,46],[-68,52],[-64,48],[-60,52],[-55,62],[-50,65],[-55,68],[-65,70],[-80,73],
+   [-100,75],[-120,72],[-140,72],[-168,72]],
 
-      drawSun(w, h);
+  // South America
+  [[-77,8],[-73,11],[-68,12],[-62,10],[-58,8],[-52,4],[-50,0],[-35,-5],[-34,-8],
+   [-38,-15],[-40,-20],[-44,-23],[-48,-28],[-52,-33],[-56,-38],[-60,-44],[-65,-52],
+   [-68,-54],[-72,-50],[-72,-45],[-70,-40],[-68,-38],[-68,-30],[-70,-20],[-75,-10],
+   [-78,0],[-80,5],[-77,8]],
 
-      const cx = w * SUN_X;
-      const cy = h * SUN_Y;
+  // Australia
+  [[114,-22],[116,-20],[120,-18],[124,-14],[128,-14],[132,-12],[136,-14],[138,-14],
+   [138,-18],[140,-22],[145,-18],[148,-20],[150,-24],[153,-28],[152,-28],[150,-30],
+   [152,-32],[152,-36],[148,-38],[144,-38],[140,-36],[136,-36],[130,-34],[126,-34],
+   [114,-34],[114,-28],[114,-22]],
 
-      planets.forEach(p => {
-        const rx = p.orbitRx * w;
-        const ry = p.orbitRy * h;
+  // Greenland
+  [[-22,76],[-18,76],[-15,78],[-20,83],[-30,84],[-40,84],[-50,82],[-55,78],
+   [-50,74],[-44,72],[-35,68],[-22,68],[-20,70],[-22,72],[-22,76]],
 
-        // Orbit path
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255,255,255,0.07)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+  // Great Britain
+  [[-5,50],[-3,50],[0,51],[2,52],[0,54],[-2,56],[-5,58],[-6,58],[-5,55],[-3,53],[-3,51],[-5,50]],
 
-        const angle = p.phase + t / p.period;
-        const px = cx + Math.cos(angle) * rx;
-        const py = cy + Math.sin(angle) * ry;
+  // Japan (Honshu)
+  [[130,31],[132,33],[134,35],[136,36],[138,37],[140,38],[141,40],[141,41],[140,42],
+   [138,40],[136,38],[134,35],[132,33],[130,31]],
 
-        // Saturn rings (behind planet)
-        if (p.rings) {
-          ctx.save();
-          ctx.translate(px, py);
-          ctx.scale(1, 0.32);
-          ctx.beginPath();
-          ctx.arc(0, 0, p.size * 2.4, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(224,208,138,0.55)';
-          ctx.lineWidth = 4;
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.arc(0, 0, p.size * 1.85, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(224,208,138,0.3)';
-          ctx.lineWidth = 2.5;
-          ctx.stroke();
-          ctx.restore();
-        }
+  // New Zealand (North Island rough)
+  [[172,-34],[175,-37],[177,-38],[178,-38],[176,-36],[174,-35],[172,-34]],
+];
 
-        // Planet body
-        const pg = ctx.createRadialGradient(px - p.size*0.35, py - p.size*0.35, 0, px, py, p.size);
-        pg.addColorStop(0, 'rgba(255,255,255,0.9)');
-        pg.addColorStop(0.2, p.color);
-        pg.addColorStop(1, shade(p.color, -60));
-        ctx.beginPath();
-        ctx.arc(px, py, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = pg;
-        ctx.fill();
+// Antarctica as a filled southern region
+const ANTARCTICA = [
+  [-180,-68],[-150,-72],[-120,-74],[-90,-72],[-60,-72],[-30,-72],
+  [0,-72],[30,-72],[60,-70],[90,-70],[120,-72],[150,-70],[180,-68],
+  [180,-90],[-180,-90]
+];
 
-        // Jupiter bands
-        if (p.bands) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(px, py, p.size, 0, Math.PI * 2);
-          ctx.clip();
-          [-0.35, -0.1, 0.15, 0.4].forEach(offset => {
-            ctx.fillStyle = 'rgba(160,80,20,0.25)';
-            ctx.fillRect(px - p.size, py + offset * p.size - 1.5, p.size * 2, 2.5);
-          });
-          ctx.restore();
-        }
+// Sahara/Arabia desert tint
+const DESERT = [
+  [0,32],[5,34],[10,33],[15,32],[20,30],[25,28],[30,26],[35,24],
+  [40,22],[45,20],[50,18],[55,22],[50,26],[45,28],[40,30],[35,32],
+  [30,34],[25,34],[20,34],[15,35],[10,36],[5,36],[0,35]
+];
 
-        // Moon
-        if (p.moons) {
-          const ma = angle * 6;
-          const mr = p.size * 2.5;
-          const mx = px + Math.cos(ma) * mr;
-          const my = py + Math.sin(ma) * mr * 0.5;
-          ctx.beginPath();
-          ctx.arc(mx, my, 1.5, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(210,210,210,0.85)';
-          ctx.fill();
-        }
-      });
+function project(lon, lat, cLon, cLat, cx, cy, R) {
+  const φ=lat*Math.PI/180, λ=lon*Math.PI/180;
+  const φ0=cLat*Math.PI/180, λ0=cLon*Math.PI/180;
+  const cosC=Math.sin(φ0)*Math.sin(φ)+Math.cos(φ0)*Math.cos(φ)*Math.cos(λ-λ0);
+  if (cosC < 0) return null;
+  return [
+    cx + R*Math.cos(φ)*Math.sin(λ-λ0),
+    cy - R*(Math.cos(φ0)*Math.sin(φ) - Math.sin(φ0)*Math.cos(φ)*Math.cos(λ-λ0))
+  ];
+}
 
-      t += 0.012;
-      requestAnimationFrame(draw);
-    }
+function drawPoly(ctx, coords, cLon, cLat, cx, cy, R) {
+  ctx.beginPath();
+  let down=false;
+  coords.forEach(([lon,lat])=>{
+    const p=project(lon,lat,cLon,cLat,cx,cy,R);
+    if(p){ down?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]); down=true; }
+    else { down=false; }
+  });
+  ctx.closePath();
+}
 
-    draw();
-  </script>
+let earthLon = -30;
+
+function drawEarth() {
+  const sz=eC.width, cx=sz/2, cy=sz/2, R=sz*.47;
+  const cLon=earthLon, cLat=20;
+  eX.clearRect(0,0,sz,sz);
+
+  eX.save();
+  eX.beginPath(); eX.arc(cx,cy,R,0,Math.PI*2); eX.clip();
+
+  // Deep ocean
+  const ocean=eX.createRadialGradient(cx-R*.15,cy-R*.2,0,cx,cy,R);
+  ocean.addColorStop(0,'#3a8fcf'); ocean.addColorStop(.35,'#1e6aaa');
+  ocean.addColorStop(.75,'#0e4278'); ocean.addColorStop(1,'#07224a');
+  eX.fillStyle=ocean; eX.fillRect(0,0,sz,sz);
+
+  // Antarctica
+  drawPoly(eX, ANTARCTICA, cLon, cLat, cx, cy, R);
+  const iceGrad=eX.createLinearGradient(0,cy,0,sz);
+  iceGrad.addColorStop(0,'#cce8f8'); iceGrad.addColorStop(1,'#eaf4ff');
+  eX.fillStyle=iceGrad; eX.fill();
+
+  // Land (all continents)
+  const landGrad=eX.createRadialGradient(cx-R*.1,cy-R*.25,0,cx,cy,R*1.1);
+  landGrad.addColorStop(0,'#5a9e48'); landGrad.addColorStop(.4,'#4a8838');
+  landGrad.addColorStop(.8,'#3a6828'); landGrad.addColorStop(1,'#2a4818');
+
+  LAND.forEach(shape=>{
+    drawPoly(eX, shape, cLon, cLat, cx, cy, R);
+    eX.fillStyle=landGrad; eX.fill();
+    eX.strokeStyle='rgba(40,90,30,.3)'; eX.lineWidth=0.6; eX.stroke();
+  });
+
+  // Desert/arid tint
+  eX.globalAlpha=0.22;
+  drawPoly(eX, DESERT, cLon, cLat, cx, cy, R);
+  eX.fillStyle='#d4a84b'; eX.fill();
+  eX.globalAlpha=1;
+
+  // Arctic ice cap (north pole glow)
+  const np=project(0,88,cLon,cLat,cx,cy,R);
+  if(np){
+    const iceN=eX.createRadialGradient(np[0],np[1],0,np[0],np[1],R*.2);
+    iceN.addColorStop(0,'rgba(230,245,255,.92)');
+    iceN.addColorStop(.55,'rgba(210,235,255,.6)');
+    iceN.addColorStop(1,'transparent');
+    eX.fillStyle=iceN; eX.fillRect(0,0,sz,sz);
+  }
+
+  // Night-side shadow (sun is top-right → shadow bottom-left)
+  const shadow=eX.createRadialGradient(cx-R*.45,cy+R*.45,R*.08,cx-R*.2,cy+R*.25,R*1.05);
+  shadow.addColorStop(0,'rgba(0,0,20,.74)'); shadow.addColorStop(.4,'rgba(0,0,15,.46)');
+  shadow.addColorStop(.8,'rgba(0,0,10,.14)'); shadow.addColorStop(1,'transparent');
+  eX.fillStyle=shadow; eX.fillRect(0,0,sz,sz);
+
+  // Specular highlight
+  const spec=eX.createRadialGradient(cx+R*.38,cy-R*.42,0,cx+R*.2,cy-R*.2,R*.9);
+  spec.addColorStop(0,'rgba(255,255,255,.16)'); spec.addColorStop(.3,'rgba(255,255,255,.05)');
+  spec.addColorStop(1,'transparent');
+  eX.fillStyle=spec; eX.fillRect(0,0,sz,sz);
+
+  // Atmosphere limb (inner edge glow)
+  const atm=eX.createRadialGradient(cx,cy,R*.96,cx,cy,R);
+  atm.addColorStop(0,'transparent'); atm.addColorStop(1,'rgba(100,185,255,.25)');
+  eX.fillStyle=atm; eX.fillRect(0,0,sz,sz);
+
+  eX.restore();
+
+  // Outer atmosphere halo
+  const halo=eX.createRadialGradient(cx,cy,R*.97,cx,cy,R*1.1);
+  halo.addColorStop(0,'rgba(80,160,255,.36)'); halo.addColorStop(.5,'rgba(60,130,220,.1)');
+  halo.addColorStop(1,'transparent');
+  eX.fillStyle=halo;
+  eX.beginPath(); eX.arc(cx,cy,R*1.1,0,Math.PI*2); eX.fill();
+
+  earthLon+=0.018;
+  requestAnimationFrame(drawEarth);
+}
+drawEarth();
+</script>
 </body>
 </html>
