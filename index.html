@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  }
+  canvas#bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  .earth {
+    position: fixed;
+    bottom: -38%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vmin;
+    height: 90vmin;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 25% 25%, rgba(255,255,255,0.12) 0%, transparent 14%),
+      radial-gradient(ellipse at 55% 35%, #3a9a5c 0%, #3a9a5c 12%, transparent 13%),
+      radial-gradient(ellipse at 22% 52%, #2d8a4e 0%, #2d8a4e 9%, transparent 10%),
+      radial-gradient(ellipse at 78% 62%, #2d8a4e 0%, #2d8a4e 11%, transparent 12%),
+      radial-gradient(ellipse at 48% 78%, #3a9a5c 0%, #3a9a5c 7%, transparent 8%),
+      radial-gradient(ellipse at 82% 22%, #2d8a4e 0%, #2d8a4e 5%, transparent 6%),
+      radial-gradient(ellipse at 15% 75%, #2d8a4e 0%, #2d8a4e 6%, transparent 7%),
+      linear-gradient(135deg, #1e7ecf 0%, #1a5a9e 45%, #0d3d6e 100%);
+    box-shadow:
+      0 0 80px rgba(30, 110, 220, 0.6),
+      0 0 160px rgba(10, 60, 150, 0.3),
+      inset -25px -25px 70px rgba(0, 0, 40, 0.75),
+      inset 8px 8px 40px rgba(120, 190, 255, 0.08);
+    z-index: 2;
+  }
+  .atmosphere {
+    position: fixed;
+    bottom: -38%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(90vmin + 40px);
+    height: calc(90vmin + 40px);
+    border-radius: 50%;
+    background: radial-gradient(circle at center,
+      transparent 46%,
+      rgba(100, 180, 255, 0.06) 48%,
+      rgba(80, 150, 255, 0.12) 50%,
+      rgba(60, 120, 220, 0.08) 52%,
+      transparent 55%
+    );
+    z-index: 3;
+    pointer-events: none;
+  }
+  .title-container {
+    position: fixed;
+    top: 32%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+  }
+  h1 {
+    font-size: clamp(2.2rem, 5.5vw, 5rem);
+    color: #fff;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    font-weight: 300;
+    text-shadow:
+      0 0 8px rgba(180, 220, 255, 1),
+      0 0 25px rgba(120, 180, 255, 0.9),
+      0 0 55px rgba(80, 145, 255, 0.6),
+      0 0 100px rgba(50, 110, 255, 0.35);
+  }
+  .subtitle {
+    margin-top: 10px;
+    font-size: clamp(0.7rem, 1.5vw, 1rem);
+    color: rgba(180, 220, 255, 0.6);
+    letter-spacing: 0.6em;
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+</style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="earth"></div>
+  <div class="atmosphere"></div>
+  <div class="title-container">
+    <h1>Project Atlas</h1>
+    <p class="subtitle">A New World Awaits</p>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Stars
+    const NUM_STARS = 500;
+    const starData = Array.from({length: NUM_STARS}, () => ({
+      x: Math.random(),
+      y: Math.random(),
+      r: Math.random() * 1.4 + 0.1,
+      alpha: Math.random() * 0.7 + 0.3,
+      dAlpha: (Math.random() * 0.004 + 0.001) * (Math.random() > 0.5 ? 1 : -1)
+    }));
+
+    // Sun origin: top-right corner
+    const SUN_X = 0.93;
+    const SUN_Y = -0.06;
+
+    function drawSun(w, h) {
+      const sx = w * SUN_X, sy = h * SUN_Y;
+      const sr = Math.min(w, h) * 0.22;
+      // Outer glow layers
+      [[sr * 3.5, 0.03], [sr * 2.5, 0.06], [sr * 1.8, 0.12], [sr * 1.2, 0.25]].forEach(([r, a]) => {
+        const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, r);
+        g.addColorStop(0, `rgba(255,190,40,${a})`);
+        g.addColorStop(1, 'transparent');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+      });
+      // Sun body
+      const sg = ctx.createRadialGradient(sx * 0.96, sy * 0.8, 0, sx, sy, sr);
+      sg.addColorStop(0,   '#ffffdd');
+      sg.addColorStop(0.25,'#ffee55');
+      sg.addColorStop(0.6, '#ffaa00');
+      sg.addColorStop(0.85,'#ff7700');
+      sg.addColorStop(1,   '#cc4400');
+      ctx.beginPath();
+      ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+      ctx.fillStyle = sg;
+      ctx.fill();
+    }
+
+    // Planets: orbitRx/Ry are fractions of canvas size; origin at SUN_X, SUN_Y
+    const planets = [
+      { orbitRx: 0.13, orbitRy: 0.055, period: 7,   size: 3,  color: '#a8a8a8', phase: 0.4  },
+      { orbitRx: 0.21, orbitRy: 0.09,  period: 12,  size: 5,  color: '#d4b483', phase: 1.8  },
+      { orbitRx: 0.35, orbitRy: 0.15,  period: 28,  size: 4,  color: '#c1440e', phase: 3.2, moons: 1 },
+      { orbitRx: 0.52, orbitRy: 0.22,  period: 65,  size: 11, color: '#c8823a', phase: 5.1, bands: true },
+      { orbitRx: 0.68, orbitRy: 0.28,  period: 100, size: 9,  color: '#e0d08a', phase: 1.3, rings: true },
+      { orbitRx: 0.82, orbitRy: 0.34,  period: 140, size: 7,  color: '#7ec8e3', phase: 4.6  },
+      { orbitRx: 0.96, orbitRy: 0.40,  period: 200, size: 7,  color: '#4b70dd', phase: 2.2  },
+    ];
+
+    function shade(hex, amt) {
+      const n = parseInt(hex.replace('#',''), 16);
+      const r = Math.max(0, Math.min(255, (n >> 16) + amt));
+      const g = Math.max(0, Math.min(255, ((n >> 8) & 0xff) + amt));
+      const b = Math.max(0, Math.min(255, (n & 0xff) + amt));
+      return `rgb(${r},${g},${b})`;
+    }
+
+    let t = 0;
+    function draw() {
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // Deep space background
+      ctx.fillStyle = '#00000c';
+      ctx.fillRect(0, 0, w, h);
+
+      // Subtle nebula
+      const nb = ctx.createRadialGradient(w*0.25, h*0.45, 0, w*0.25, h*0.45, w*0.55);
+      nb.addColorStop(0, 'rgba(15,25,70,0.28)');
+      nb.addColorStop(0.5, 'rgba(10,15,50,0.1)');
+      nb.addColorStop(1, 'transparent');
+      ctx.fillStyle = nb;
+      ctx.fillRect(0, 0, w, h);
+
+      const nb2 = ctx.createRadialGradient(w*0.7, h*0.2, 0, w*0.7, h*0.2, w*0.35);
+      nb2.addColorStop(0, 'rgba(40,10,60,0.15)');
+      nb2.addColorStop(1, 'transparent');
+      ctx.fillStyle = nb2;
+      ctx.fillRect(0, 0, w, h);
+
+      // Stars
+      starData.forEach(s => {
+        s.alpha += s.dAlpha;
+        if (s.alpha > 1)   { s.alpha = 1;   s.dAlpha = -Math.abs(s.dAlpha); }
+        if (s.alpha < 0.15){ s.alpha = 0.15; s.dAlpha =  Math.abs(s.dAlpha); }
+        ctx.beginPath();
+        ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${s.alpha.toFixed(2)})`;
+        ctx.fill();
+      });
+
+      drawSun(w, h);
+
+      const cx = w * SUN_X;
+      const cy = h * SUN_Y;
+
+      planets.forEach(p => {
+        const rx = p.orbitRx * w;
+        const ry = p.orbitRy * h;
+
+        // Orbit path
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        const angle = p.phase + t / p.period;
+        const px = cx + Math.cos(angle) * rx;
+        const py = cy + Math.sin(angle) * ry;
+
+        // Saturn rings (behind planet)
+        if (p.rings) {
+          ctx.save();
+          ctx.translate(px, py);
+          ctx.scale(1, 0.32);
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size * 2.4, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(224,208,138,0.55)';
+          ctx.lineWidth = 4;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size * 1.85, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(224,208,138,0.3)';
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Planet body
+        const pg = ctx.createRadialGradient(px - p.size*0.35, py - p.size*0.35, 0, px, py, p.size);
+        pg.addColorStop(0, 'rgba(255,255,255,0.9)');
+        pg.addColorStop(0.2, p.color);
+        pg.addColorStop(1, shade(p.color, -60));
+        ctx.beginPath();
+        ctx.arc(px, py, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = pg;
+        ctx.fill();
+
+        // Jupiter bands
+        if (p.bands) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(px, py, p.size, 0, Math.PI * 2);
+          ctx.clip();
+          [-0.35, -0.1, 0.15, 0.4].forEach(offset => {
+            ctx.fillStyle = 'rgba(160,80,20,0.25)';
+            ctx.fillRect(px - p.size, py + offset * p.size - 1.5, p.size * 2, 2.5);
+          });
+          ctx.restore();
+        }
+
+        // Moon
+        if (p.moons) {
+          const ma = angle * 6;
+          const mr = p.size * 2.5;
+          const mx = px + Math.cos(ma) * mr;
+          const my = py + Math.sin(ma) * mr * 0.5;
+          ctx.beginPath();
+          ctx.arc(mx, my, 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(210,210,210,0.85)';
+          ctx.fill();
+        }
+      });
+
+      t += 0.012;
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script>
+</body>
+</html>
