@@ -70,52 +70,9 @@ h1.atlas-title {
   font-size: clamp(0.95rem, 1.6vw, 1.1rem);
   color: rgba(255,255,255,.62);
   line-height: 1.78;
-  margin-bottom: 2.2rem;
+  margin-bottom: 2.8rem;
   font-weight: 300;
 }
-
-.waitlist-row {
-  display: flex;
-  max-width: 420px;
-  width: 100%;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(100,165,255,.35);
-  background: rgba(0,5,25,.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  margin-bottom: 1.2rem;
-}
-
-.waitlist-row input[type="email"] {
-  flex: 1;
-  padding: 0.88rem 1.15rem;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 0.92rem;
-  outline: none;
-  font-family: inherit;
-  min-width: 0;
-}
-
-.waitlist-row input::placeholder { color: rgba(255,255,255,.32); }
-
-.waitlist-row button {
-  padding: 0.88rem 1.4rem;
-  background: rgba(70,135,255,.9);
-  border: none;
-  color: #fff;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  letter-spacing: 0.04em;
-  transition: background .2s;
-  white-space: nowrap;
-  font-family: inherit;
-}
-
-.waitlist-row button:hover { background: rgba(90,155,255,1); }
 
 .store-pills {
   display: flex;
@@ -301,12 +258,6 @@ h1.atlas-title {
   line-height: 1.75;
 }
 
-.no-spam {
-  margin-top: 1rem;
-  font-size: 0.74rem;
-  color: rgba(255,255,255,.2);
-}
-
 /* ── FOOTER ── */
 footer {
   background: rgba(0,0,8,.97);
@@ -339,9 +290,6 @@ footer a:hover { color: rgba(255,255,255,.5); }
 
 /* ── MOBILE ── */
 @media (max-width: 540px) {
-  .waitlist-row { flex-direction: column; }
-  .waitlist-row input[type="email"] { border-radius: 0; }
-  .waitlist-row button { border-radius: 0; }
   .features, .how, .cta-section { padding-left: 1.2rem; padding-right: 1.2rem; }
   .feature-grid { grid-template-columns: 1fr; }
 }
@@ -359,11 +307,6 @@ footer a:hover { color: rgba(255,255,255,.5); }
     <h1 class="atlas-title">Project Atlas</h1>
     <p class="hero-tagline">Explore &nbsp;·&nbsp; Learn &nbsp;·&nbsp; Connect</p>
     <p class="hero-desc">A geography adventure that takes you to every corner of the world. Discover 195 countries, master their capitals, collect national pets, and build your global base camp.</p>
-
-    <form class="waitlist-row" onsubmit="submitWaitlist(event)">
-      <input type="email" placeholder="Enter your email to join the waitlist" required>
-      <button type="submit">Notify Me</button>
-    </form>
 
     <div class="store-pills">
       <span class="store-pill">🍎&nbsp; Coming to iOS</span>
@@ -445,15 +388,12 @@ footer a:hover { color: rgba(255,255,255,.5); }
 
   <!-- ── CTA ── -->
   <section class="cta-section">
-    <h2>Be first to explore</h2>
-    <p class="cta-sub">Atlas is coming to iOS and Android. Join the waitlist and we'll tell you the moment it's ready.</p>
-
-    <form class="waitlist-row" style="max-width:400px;margin:0 auto;" onsubmit="submitWaitlist(event)">
-      <input type="email" placeholder="Your email address" required>
-      <button type="submit">Join Waitlist</button>
-    </form>
-
-    <p class="no-spam">No spam. Unsubscribe any time.</p>
+    <h2>Coming soon</h2>
+    <p class="cta-sub">Atlas is launching on iOS and Android. Follow along as we build a world worth exploring.</p>
+    <div class="store-pills" style="justify-content:center;">
+      <span class="store-pill">🍎&nbsp; Coming to iOS</span>
+      <span class="store-pill">🤖&nbsp; Coming to Android</span>
+    </div>
   </section>
 
   <!-- ── FOOTER ── -->
@@ -465,16 +405,6 @@ footer a:hover { color: rgba(255,255,255,.5); }
 </div>
 
 <script>
-function submitWaitlist(e) {
-  e.preventDefault();
-  const btn = e.target.querySelector('button');
-  const orig = btn.textContent;
-  btn.textContent = '✓ You\'re on the list!';
-  btn.style.background = 'rgba(34,170,90,.9)';
-  e.target.querySelector('input').value = '';
-  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 4000);
-}
-
 // ── BACKGROUND ────────────────────────────────────────────────────────────────
 const bgC = document.getElementById('bg');
 const bgX = bgC.getContext('2d');
