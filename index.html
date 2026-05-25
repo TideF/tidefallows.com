@@ -692,8 +692,8 @@ function project(lon, lat, cLon, cLat, cx, cy, R) {
 function drawPoly(ctx, coords, cLon, cLat, cx, cy, R) {
   const n = coords.length;
   const vis = coords.map(([lo, la]) => _cosC(lo, la, cLon, cLat) >= 0);
-  if (!vis.some(v => v)) return; // entirely on back-face, skip
-  ctx.beginPath();
+  ctx.beginPath(); // always clear path before early return so stale paths don't get filled
+  if (!vis.some(v => v)) return;
   let started = false;
   for (let i = 0; i < n; i++) {
     const j = (i+1) % n;
