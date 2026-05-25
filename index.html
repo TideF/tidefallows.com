@@ -145,6 +145,74 @@ h1.atlas-title {
   font-size: 0.97rem;
 }
 
+/* ── PORTALS ── */
+.portals {
+  background: rgba(0,0,10,.88);
+  padding: 5rem 2rem 4.5rem;
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  max-width: 1060px;
+  margin: 0 auto;
+}
+
+.portal-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  padding: 2.4rem 2rem;
+  text-decoration: none;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(255,255,255,.03);
+  transition: transform .28s, border-color .28s, background .28s;
+}
+
+.portal-card:hover { transform: translateY(-6px); }
+
+.portal-continents { border-color: rgba(80,200,100,.18); }
+.portal-continents:hover { border-color: rgba(80,200,100,.45); background: rgba(80,200,100,.07); }
+
+.portal-oceans { border-color: rgba(40,160,230,.18); }
+.portal-oceans:hover { border-color: rgba(40,160,230,.45); background: rgba(40,160,230,.07); }
+
+.portal-space { border-color: rgba(150,90,255,.18); }
+.portal-space:hover { border-color: rgba(150,90,255,.45); background: rgba(150,90,255,.07); }
+
+.portal-icon { font-size: 2.6rem; margin-bottom: 1rem; }
+
+.portal-card h3 {
+  font-family: 'Palatino Linotype', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.65rem;
+}
+
+.portal-card p {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,.46);
+  line-height: 1.72;
+  flex: 1;
+  margin-bottom: 1.6rem;
+}
+
+.portal-enter {
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  transition: color .2s;
+}
+
+.portal-continents:hover .portal-enter { color: rgba(80,200,100,.85); }
+.portal-oceans:hover .portal-enter { color: rgba(40,160,230,.85); }
+.portal-space:hover .portal-enter { color: rgba(150,90,255,.85); }
+
 /* ── FEATURES ── */
 .features {
   background: rgba(0,2,18,.9);
@@ -314,6 +382,33 @@ footer a:hover { color: rgba(255,255,255,.5); }
     </div>
 
     <div class="scroll-cue">↓ &nbsp; discover more</div>
+  </section>
+
+  <!-- ── PORTALS ── -->
+  <section class="portals">
+    <p class="section-label">Three portals</p>
+    <h2 class="section-title">Where will you explore?</h2>
+    <p class="section-sub">Each portal is a world unto itself. Choose one and begin your Atlas journey.</p>
+    <div class="portal-grid">
+      <a href="continents.html" class="portal-card portal-continents">
+        <div class="portal-icon">🌍</div>
+        <h3>Continents</h3>
+        <p>Explore 195 countries across 7 continents. Place them on the map, discover their capitals, and meet their national animals.</p>
+        <span class="portal-enter">Enter Portal →</span>
+      </a>
+      <a href="oceans.html" class="portal-card portal-oceans">
+        <div class="portal-icon">🌊</div>
+        <h3>Oceans</h3>
+        <p>Dive beneath the surface of Earth's five oceans. Discover their depths, ecosystems, and the mysteries they hold.</p>
+        <span class="portal-enter">Enter Portal →</span>
+      </a>
+      <a href="space.html" class="portal-card portal-space">
+        <div class="portal-icon">✦</div>
+        <h3>Stars</h3>
+        <p>Journey beyond Earth into the cosmos. Explore planets, constellations, and the infinite universe above us all.</p>
+        <span class="portal-enter">Enter Portal →</span>
+      </a>
+    </div>
   </section>
 
   <!-- ── FEATURES ── -->

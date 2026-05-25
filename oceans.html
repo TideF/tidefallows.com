@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oceans Portal — Project Atlas</title>
+<meta name="description" content="Dive beneath the surface of Earth's five oceans. Discover their depths, ecosystems, and the mysteries they hold.">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; scroll-behavior: smooth; }
+
+#bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+.page { position: relative; z-index: 10; }
+
+/* NAV */
+.portal-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; padding: 1.1rem 2rem;
+  background: rgba(0,5,18,.65); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(40,160,230,.08);
+}
+.nav-back {
+  display: flex; align-items: center; gap: 0.45rem;
+  text-decoration: none; color: rgba(255,255,255,.5);
+  font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; transition: color .2s;
+}
+.nav-back:hover { color: rgba(255,255,255,.9); }
+.nav-title {
+  margin-left: auto;
+  font-family: 'Palatino Linotype', Georgia, serif;
+  font-size: 0.82rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: rgba(40,170,230,.75); font-weight: 300;
+}
+
+/* HERO */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 7rem 2rem 3rem; text-align: center; position: relative;
+}
+.portal-badge {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.38rem 1rem; border: 1px solid rgba(40,160,230,.3);
+  border-radius: 40px; font-size: 0.7rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: rgba(40,160,230,.8);
+  background: rgba(40,160,230,.06); margin-bottom: 1.8rem;
+}
+h1.portal-title {
+  font-family: 'Palatino Linotype', Georgia, serif;
+  font-size: clamp(2.2rem, 5vw, 4.5rem); font-weight: 300;
+  letter-spacing: 0.3em; text-transform: uppercase; color: #fff;
+  text-shadow: 0 0 8px rgba(40,160,230,.9), 0 0 30px rgba(40,160,230,.45), 0 0 70px rgba(40,160,230,.2);
+  margin-bottom: 0.7rem;
+}
+.hero-tagline {
+  font-family: 'Palatino Linotype', Georgia, serif;
+  font-size: clamp(0.72rem, 1.5vw, 1rem); color: rgba(140,210,255,.5);
+  letter-spacing: 0.5em; text-transform: uppercase; font-weight: 300; margin-bottom: 1.6rem;
+}
+.hero-desc {
+  max-width: 500px; font-size: clamp(0.93rem, 1.5vw, 1.05rem);
+  color: rgba(255,255,255,.52); line-height: 1.8; font-weight: 300; margin-bottom: 2.8rem;
+}
+.stat-row { display: flex; gap: 2.5rem; justify-content: center; flex-wrap: wrap; }
+.stat { text-align: center; }
+.stat-num {
+  font-family: 'Palatino Linotype', Georgia, serif; font-size: 2rem;
+  font-weight: 300; color: rgba(40,170,230,.9); line-height: 1; margin-bottom: 0.3rem;
+}
+.stat-label { font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,.3); }
+.scroll-cue {
+  position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+  font-size: 0.68rem; color: rgba(255,255,255,.28); letter-spacing: 0.24em;
+  text-transform: uppercase; animation: floatDown 2.6s ease-in-out infinite; white-space: nowrap;
+}
+@keyframes floatDown {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: .28; }
+  50% { transform: translateX(-50%) translateY(8px); opacity: .5; }
+}
+
+/* CONTENT */
+.content-section { background: rgba(0,5,18,.94); padding: 6rem 2rem 5rem; }
+.section-label {
+  text-align: center; font-size: 0.68rem; letter-spacing: 0.38em;
+  text-transform: uppercase; color: rgba(40,160,230,.65); margin-bottom: 0.7rem; font-weight: 500;
+}
+.section-title {
+  text-align: center; font-family: 'Palatino Linotype', Georgia, serif;
+  font-size: clamp(1.7rem, 3vw, 2.5rem); font-weight: 300;
+  color: #fff; margin-bottom: 0.9rem; letter-spacing: 0.04em;
+}
+.section-sub {
+  text-align: center; max-width: 500px; margin: 0 auto 3.5rem;
+  color: rgba(255,255,255,.38); line-height: 1.78; font-size: 0.95rem;
+}
+.card-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem; max-width: 1060px; margin: 0 auto;
+}
+.item-card {
+  border: 1px solid rgba(40,160,230,.12); border-radius: 14px;
+  padding: 1.8rem; background: rgba(40,160,230,.04);
+  transition: border-color .25s, background .25s, transform .25s;
+}
+.item-card:hover { border-color: rgba(40,160,230,.35); background: rgba(40,160,230,.09); transform: translateY(-3px); }
+.card-name {
+  font-family: 'Palatino Linotype', Georgia, serif; font-size: 1.25rem;
+  font-weight: 300; letter-spacing: 0.06em; color: #fff; margin-bottom: 0.8rem;
+}
+.card-meta { display: flex; gap: 1.6rem; margin-bottom: 0.85rem; flex-wrap: wrap; }
+.meta-item { display: flex; flex-direction: column; gap: 0.18rem; }
+.meta-num { font-size: 1rem; font-weight: 600; color: rgba(40,170,230,.85); line-height: 1; }
+.meta-label { font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,.3); }
+.card-desc { font-size: 0.85rem; color: rgba(255,255,255,.42); line-height: 1.68; }
+
+/* COMING SOON */
+.coming-soon { background: rgba(0,4,14,.92); padding: 5rem 2rem; text-align: center; }
+.cs-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1.2rem; border: 1px solid rgba(40,160,230,.28);
+  border-radius: 40px; font-size: 0.76rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: rgba(40,160,230,.7);
+  background: rgba(40,160,230,.07); margin-bottom: 1.5rem;
+}
+.coming-soon h2 {
+  font-family: 'Palatino Linotype', Georgia, serif;
+  font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 300;
+  color: #fff; margin-bottom: 0.8rem; letter-spacing: 0.04em;
+}
+.coming-soon p { color: rgba(255,255,255,.38); font-size: 0.95rem; max-width: 440px; margin: 0 auto; line-height: 1.75; }
+
+/* FOOTER */
+footer { background: rgba(0,0,8,.97); padding: 2.2rem 2rem; text-align: center; border-top: 1px solid rgba(255,255,255,.06); }
+.footer-logo { font-family: 'Palatino Linotype', Georgia, serif; font-size: 0.9rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,.22); font-weight: 300; margin-bottom: 0.4rem; }
+footer small { font-size: 0.74rem; color: rgba(255,255,255,.14); }
+footer a { color: rgba(255,255,255,.22); text-decoration: none; }
+footer a:hover { color: rgba(255,255,255,.5); }
+
+@media (max-width: 540px) {
+  .content-section, .coming-soon { padding-left: 1.2rem; padding-right: 1.2rem; }
+  .card-grid { grid-template-columns: 1fr; }
+  .stat-row { gap: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<nav class="portal-nav">
+  <a href="index.html" class="nav-back">← Project Atlas</a>
+  <span class="nav-title">Oceans</span>
+</nav>
+
+<div class="page">
+
+  <section class="hero">
+    <div class="portal-badge">🌊 &nbsp; Portal Two</div>
+    <h1 class="portal-title">Oceans</h1>
+    <p class="hero-tagline">Five oceans &nbsp;·&nbsp; Endless depths &nbsp;·&nbsp; Ancient secrets</p>
+    <p class="hero-desc">More than 70% of our planet is water. Earth's five oceans hold 97% of all life, 95% of which remains unexplored. Your descent begins here.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">Oceans</div></div>
+      <div class="stat"><div class="stat-num">361M</div><div class="stat-label">km²</div></div>
+      <div class="stat"><div class="stat-num">10,935</div><div class="stat-label">Deepest (m)</div></div>
+      <div class="stat"><div class="stat-num">97%</div><div class="stat-label">Of Earth's Water</div></div>
+    </div>
+    <div class="scroll-cue">↓ &nbsp; explore oceans</div>
+  </section>
+
+  <section class="content-section">
+    <p class="section-label">The five oceans</p>
+    <h2 class="section-title">From surface to abyss</h2>
+    <p class="section-sub">Each ocean has its own character, its own depths, and its own wonders. Dive in and discover what lies beneath.</p>
+    <div class="card-grid">
+
+      <div class="item-card">
+        <div class="card-name">Pacific Ocean</div>
+        <div class="card-meta">
+          <div class="meta-item"><span class="meta-num">165.25M km²</span><span class="meta-label">Area</span></div>
+          <div class="meta-item"><span class="meta-num">10,935 m</span><span class="meta-label">Deepest Point</span></div>
+        </div>
+        <p class="card-desc">The largest and deepest ocean on Earth. The Mariana Trench plunges deeper than Everest is tall. It holds more than half of all the world's ocean water.</p>
+      </div>
+
+      <div class="item-card">
+        <div class="card-name">Atlantic Ocean</div>
+        <div class="card-meta">
+          <div class="meta-item"><span class="meta-num">106.46M km²</span><span class="meta-label">Area</span></div>
+          <div class="meta-item"><span class="meta-num">8,376 m</span><span class="meta-label">Deepest Point</span></div>
+        </div>
+        <p class="card-desc">The ocean that connects the Old World and the New. The Mid-Atlantic Ridge — the longest mountain range on Earth — runs along its floor.</p>
+      </div>
+
+      <div class="item-card">
+        <div class="card-name">Indian Ocean</div>
+        <div class="card-meta">
+          <div class="meta-item"><span class="meta-num">70.56M km²</span><span class="meta-label">Area</span></div>
+          <div class="meta-item"><span class="meta-num">7,258 m</span><span class="meta-label">Deepest Point</span></div>
+        </div>
+        <p class="card-desc">The warmest of the world's oceans. Ancient mariners navigated its monsoon winds for millennia to trade spices, silk, and gold across continents.</p>
+      </div>
+
+      <div class="item-card">
+        <div class="card-name">Southern Ocean</div>
+        <div class="card-meta">
+          <div class="meta-item"><span class="meta-num">21.96M km²</span><span class="meta-label">Area</span></div>
+          <div class="meta-item"><span class="meta-num">7,236 m</span><span class="meta-label">Deepest Point</span></div>
+        </div>
+        <p class="card-desc">The newest named ocean, encircling Antarctica. The Antarctic Circumpolar Current is the planet's largest ocean current, driving global climate systems.</p>
+      </div>
+
+      <div class="item-card">
+        <div class="card-name">Arctic Ocean</div>
+        <div class="card-meta">
+          <div class="meta-item"><span class="meta-num">14.06M km²</span><span class="meta-label">Area</span></div>
+          <div class="meta-item"><span class="meta-num">5,550 m</span><span class="meta-label">Deepest Point</span></div>
+        </div>
+        <p class="card-desc">The smallest and shallowest ocean, covered by sea ice for much of the year. Polar bears, narwhals, and the midnight sun call this frozen frontier home.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="coming-soon">
+    <div class="cs-badge">🎮 &nbsp; Quiz Mode</div>
+    <h2>Ready to dive deeper?</h2>
+    <p>The Oceans Quiz is coming soon — test your knowledge of depths, currents, and marine life across four challenging tiers.</p>
+  </section>
+
+  <footer>
+    <p class="footer-logo">Project Atlas</p>
+    <small>© 2026 Tide Fallows &nbsp;·&nbsp; <a href="mailto:tidefallows@gmail.com">tidefallows@gmail.com</a></small>
+  </footer>
+
+</div>
+
+<script>
+const bgC = document.getElementById('bg');
+const bgX = bgC.getContext('2d');
+function resizeBg() { bgC.width = innerWidth; bgC.height = innerHeight; }
+resizeBg(); window.addEventListener('resize', resizeBg);
+
+const stars = Array.from({length:600}, () => ({
+  x:Math.random(), y:Math.random(), r:Math.random()*1.2+0.1,
+  a:Math.random()*.6+.25, da:(Math.random()*.004+.001)*(Math.random()>.5?1:-1)
+}));
+
+const planets = [
+  {rx:.13,ry:.055,T:7,   s:3,  c:'#a8a8a8', ph:.4},
+  {rx:.21,ry:.09, T:12,  s:5,  c:'#d4b483', ph:1.8},
+  {rx:.35,ry:.15, T:28,  s:4,  c:'#c1440e', ph:3.2, moons:1},
+  {rx:.52,ry:.22, T:65,  s:11, c:'#c8823a', ph:5.1, bands:true},
+  {rx:.68,ry:.28, T:100, s:9,  c:'#e0d08a', ph:1.3, rings:true},
+  {rx:.82,ry:.34, T:140, s:7,  c:'#7ec8e3', ph:4.6},
+  {rx:.96,ry:.40, T:200, s:7,  c:'#4b70dd', ph:2.2},
+];
+
+function shade(hex,a) {
+  const n=parseInt(hex.replace('#',''),16);
+  return `rgb(${Math.max(0,Math.min(255,(n>>16)+a))},${Math.max(0,Math.min(255,((n>>8)&255)+a))},${Math.max(0,Math.min(255,(n&255)+a))})`;
+}
+
+function drawSun(w,h) {
+  const sx=w*.93, sy=h*-.06, sr=Math.min(w,h)*.22;
+  [[sr*3.5,.03],[sr*2.5,.06],[sr*1.8,.12],[sr*1.2,.25]].forEach(([r,a]) => {
+    const g=bgX.createRadialGradient(sx,sy,0,sx,sy,r);
+    g.addColorStop(0,`rgba(255,190,40,${a})`); g.addColorStop(1,'transparent');
+    bgX.fillStyle=g; bgX.fillRect(0,0,w,h);
+  });
+  const sg=bgX.createRadialGradient(sx*.96,sy*.8,0,sx,sy,sr);
+  sg.addColorStop(0,'#ffffdd'); sg.addColorStop(.25,'#ffee55');
+  sg.addColorStop(.6,'#ffaa00'); sg.addColorStop(.85,'#ff7700'); sg.addColorStop(1,'#cc4400');
+  bgX.beginPath(); bgX.arc(sx,sy,sr,0,Math.PI*2); bgX.fillStyle=sg; bgX.fill();
+}
+
+let bgT=0;
+function drawBg() {
+  const w=bgC.width, h=bgC.height;
+  bgX.clearRect(0,0,w,h);
+  bgX.fillStyle='#00020e'; bgX.fillRect(0,0,w,h);
+  /* ocean-blue nebula */
+  const nb=bgX.createRadialGradient(w*.3,h*.5,0,w*.3,h*.5,w*.6);
+  nb.addColorStop(0,'rgba(10,40,100,.35)'); nb.addColorStop(1,'transparent');
+  bgX.fillStyle=nb; bgX.fillRect(0,0,w,h);
+  const nb2=bgX.createRadialGradient(w*.7,h*.2,0,w*.7,h*.2,w*.4);
+  nb2.addColorStop(0,'rgba(0,60,120,.2)'); nb2.addColorStop(1,'transparent');
+  bgX.fillStyle=nb2; bgX.fillRect(0,0,w,h);
+  /* deep glow at bottom */
+  const dg=bgX.createLinearGradient(0,h*.6,0,h);
+  dg.addColorStop(0,'transparent'); dg.addColorStop(1,'rgba(0,30,80,.45)');
+  bgX.fillStyle=dg; bgX.fillRect(0,0,w,h);
+
+  stars.forEach(s => {
+    s.a+=s.da;
+    if(s.a>1){s.a=1;s.da=-Math.abs(s.da);} if(s.a<.15){s.a=.15;s.da=Math.abs(s.da);}
+    bgX.beginPath(); bgX.arc(s.x*w,s.y*h,s.r,0,Math.PI*2);
+    bgX.fillStyle=`rgba(180,220,255,${s.a.toFixed(2)})`; bgX.fill();
+  });
+
+  drawSun(w,h);
+  const cx=w*.93, cy=h*-.06;
+  planets.forEach(p => {
+    const rx=p.rx*w, ry=p.ry*h;
+    bgX.beginPath(); bgX.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+    bgX.strokeStyle='rgba(100,180,255,.06)'; bgX.lineWidth=1; bgX.stroke();
+    const ang=p.ph+bgT/p.T, px=cx+Math.cos(ang)*rx, py=cy+Math.sin(ang)*ry;
+    if(p.rings) {
+      bgX.save(); bgX.translate(px,py); bgX.scale(1,.32);
+      bgX.beginPath(); bgX.arc(0,0,p.s*2.4,0,Math.PI*2); bgX.strokeStyle='rgba(224,208,138,.55)'; bgX.lineWidth=4; bgX.stroke();
+      bgX.beginPath(); bgX.arc(0,0,p.s*1.85,0,Math.PI*2); bgX.strokeStyle='rgba(224,208,138,.3)'; bgX.lineWidth=2.5; bgX.stroke();
+      bgX.restore();
+    }
+    const pg=bgX.createRadialGradient(px-p.s*.35,py-p.s*.35,0,px,py,p.s);
+    pg.addColorStop(0,'rgba(255,255,255,.9)'); pg.addColorStop(.2,p.c); pg.addColorStop(1,shade(p.c,-60));
+    bgX.beginPath(); bgX.arc(px,py,p.s,0,Math.PI*2); bgX.fillStyle=pg; bgX.fill();
+    if(p.bands) {
+      bgX.save(); bgX.beginPath(); bgX.arc(px,py,p.s,0,Math.PI*2); bgX.clip();
+      [-.35,-.1,.15,.4].forEach(o => { bgX.fillStyle='rgba(160,80,20,.25)'; bgX.fillRect(px-p.s,py+o*p.s-1.5,p.s*2,2.5); });
+      bgX.restore();
+    }
+    if(p.moons) {
+      const ma=ang*6, mr=p.s*2.5;
+      bgX.beginPath(); bgX.arc(px+Math.cos(ma)*mr,py+Math.sin(ma)*mr*.5,1.5,0,Math.PI*2);
+      bgX.fillStyle='rgba(210,210,210,.85)'; bgX.fill();
+    }
+  });
+  bgT+=.012;
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+</script>
+</body>
+</html>
