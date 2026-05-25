@@ -738,8 +738,8 @@ function drawEarth() {
   eX.fillStyle=iceGrad; eX.fill();
 
   const landGrad=eX.createRadialGradient(cx-R*.1,cy-R*.25,0,cx,cy,R*1.1);
-  landGrad.addColorStop(0,'#ff69b4'); landGrad.addColorStop(.4,'#e0508a');
-  landGrad.addColorStop(.8,'#c0306a'); landGrad.addColorStop(1,'#8b1a4a');
+  landGrad.addColorStop(0,'#5a9e48'); landGrad.addColorStop(.4,'#4a8838');
+  landGrad.addColorStop(.8,'#3a6828'); landGrad.addColorStop(1,'#2a4818');
   LAND.forEach(shape => {
     drawPoly(eX, shape, cLon, cLat, cx, cy, R);
     eX.fillStyle=landGrad; eX.fill();
