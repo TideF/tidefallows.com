@@ -690,30 +690,25 @@ function project(lon, lat, cLon, cLat, cx, cy, R) {
 }
 
 function drawPoly(ctx, coords, cLon, cLat, cx, cy, R) {
+  ctx.beginPath();
   const n = coords.length;
-  const vis = coords.map(([lo, la]) => _cosC(lo, la, cLon, cLat) >= 0);
-  ctx.beginPath(); // always clear path before early return so stale paths don't get filled
-  if (!vis.some(v => v)) return;
-  let started = false;
+  // Sutherland-Hodgman clip: produces a single closed polygon so there are
+  // no disconnected subpaths that cause shapes to jump as vertices cross the horizon
+  const out = [];
   for (let i = 0; i < n; i++) {
-    const j = (i+1) % n;
     const [lon1, lat1] = coords[i];
-    const [lon2, lat2] = coords[j];
-    const v1 = vis[i], v2 = vis[j];
-    if (v1 && v2) {
-      if (!started) { const p = _projectPt(lon1,lat1,cLon,cLat,cx,cy,R); ctx.moveTo(p[0],p[1]); started=true; }
-      const p2 = _projectPt(lon2,lat2,cLon,cLat,cx,cy,R); ctx.lineTo(p2[0],p2[1]);
-    } else if (v1 && !v2) {
-      if (!started) { const p = _projectPt(lon1,lat1,cLon,cLat,cx,cy,R); ctx.moveTo(p[0],p[1]); started=true; }
-      const [cl,cla] = _horizonCross(lon1,lat1,lon2,lat2,cLon,cLat);
-      const cp = _projectPt(cl,cla,cLon,cLat,cx,cy,R); ctx.lineTo(cp[0],cp[1]);
-    } else if (!v1 && v2) {
-      const [cl,cla] = _horizonCross(lon1,lat1,lon2,lat2,cLon,cLat);
-      const cp = _projectPt(cl,cla,cLon,cLat,cx,cy,R); ctx.moveTo(cp[0],cp[1]);
-      const p2 = _projectPt(lon2,lat2,cLon,cLat,cx,cy,R); ctx.lineTo(p2[0],p2[1]);
-      started = true;
-    }
-    // both invisible: skip edge
+    const [lon2, lat2] = coords[(i+1) % n];
+    const v1 = _cosC(lon1, lat1, cLon, cLat) >= 0;
+    const v2 = _cosC(lon2, lat2, cLon, cLat) >= 0;
+    if (v1) out.push([lon1, lat1]);
+    if (v1 !== v2) out.push(_horizonCross(lon1, lat1, lon2, lat2, cLon, cLat));
+  }
+  if (out.length === 0) return;
+  const p0 = _projectPt(out[0][0], out[0][1], cLon, cLat, cx, cy, R);
+  ctx.moveTo(p0[0], p0[1]);
+  for (let i = 1; i < out.length; i++) {
+    const p = _projectPt(out[i][0], out[i][1], cLon, cLat, cx, cy, R);
+    ctx.lineTo(p[0], p[1]);
   }
   ctx.closePath();
 }
