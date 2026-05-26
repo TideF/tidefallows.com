@@ -34,25 +34,15 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 0;
+  justify-content: center;
+  padding: 2rem;
   text-align: center;
   position: relative;
 }
 
-.hero-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2.8rem 2rem 1.8rem;
-  width: 100%;
-  min-height: 42vh;
-}
-
 h1.atlas-title {
   font-family: 'Palatino Linotype', Georgia, serif;
-  font-size: clamp(1.9rem, 4vw, 3.6rem);
+  font-size: clamp(2.4rem, 5.5vw, 5rem);
   font-weight: 300;
   letter-spacing: 0.35em;
   text-transform: uppercase;
@@ -62,25 +52,25 @@ h1.atlas-title {
     0 0 25px rgba(120,180,255,.9),
     0 0 55px rgba(80,145,255,.6),
     0 0 100px rgba(50,110,255,.35);
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.6rem;
 }
 
 .hero-tagline {
   font-family: 'Palatino Linotype', Georgia, serif;
-  font-size: clamp(0.65rem, 1.2vw, 0.85rem);
+  font-size: clamp(0.75rem, 1.6vw, 1.05rem);
   color: rgba(180,220,255,.65);
   letter-spacing: 0.55em;
   text-transform: uppercase;
   font-weight: 300;
-  margin-bottom: 1rem;
+  margin-bottom: 1.8rem;
 }
 
 .hero-desc {
-  max-width: 480px;
-  font-size: clamp(0.82rem, 1.3vw, 0.95rem);
+  max-width: 520px;
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
   color: rgba(255,255,255,.62);
-  line-height: 1.72;
-  margin-bottom: 1.4rem;
+  line-height: 1.78;
+  margin-bottom: 2.8rem;
   font-weight: 300;
 }
 
@@ -89,20 +79,20 @@ h1.atlas-title {
   gap: 0.75rem;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 0;
+  margin-bottom: 4rem;
 }
 
 .store-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.1rem;
   border: 1px solid rgba(255,255,255,.16);
   border-radius: 40px;
   background: rgba(255,255,255,.05);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  font-size: 0.76rem;
+  font-size: 0.8rem;
   color: rgba(255,255,255,.42);
   letter-spacing: 0.03em;
 }
@@ -123,168 +113,6 @@ h1.atlas-title {
 @keyframes floatDown {
   0%, 100% { transform: translateX(-50%) translateY(0); opacity: .28; }
   50% { transform: translateX(-50%) translateY(8px); opacity: .5; }
-}
-
-/* ── HERO PORTALS (Zone 2) ── */
-.hero-portals {
-  display: flex;
-  gap: 1.2rem;
-  align-items: stretch;
-  justify-content: center;
-  padding: 0 1.5rem 2.5rem;
-  width: 100%;
-  min-height: 50vh;
-  flex: 1;
-}
-
-.hero-portal-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  border-radius: 20px;
-  padding: 2rem 1.6rem 1.6rem;
-  text-decoration: none;
-  color: #fff;
-  flex: 1;
-  max-width: 340px;
-  min-height: 42vh;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: transform .28s ease, border-color .28s ease, background .28s ease, box-shadow .28s ease;
-}
-
-/* Continents */
-.hero-portal-continents {
-  background: linear-gradient(170deg, rgba(5,25,8,1) 0%, rgba(2,12,4,1) 100%);
-  border: 1px solid rgba(80,200,100,.22);
-  box-shadow: 0 0 28px rgba(80,200,100,.08), inset 0 0 60px rgba(80,200,100,.04);
-}
-.hero-portal-continents::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 70% 45% at 30% 60%, rgba(60,160,80,.13) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 35% at 72% 40%, rgba(40,130,60,.10) 0%, transparent 65%),
-    radial-gradient(ellipse 40% 30% at 55% 80%, rgba(30,100,45,.08) 0%, transparent 60%);
-  pointer-events: none;
-}
-.hero-portal-continents:hover {
-  transform: translateY(-4px);
-  border-color: rgba(80,200,100,.55);
-  background: linear-gradient(170deg, rgba(8,32,10,1) 0%, rgba(4,18,6,1) 100%);
-  box-shadow: 0 8px 40px rgba(80,200,100,.18), inset 0 0 60px rgba(80,200,100,.07);
-}
-
-/* Oceans */
-.hero-portal-oceans {
-  background: linear-gradient(170deg, rgba(2,10,35,1) 0%, rgba(0,5,20,1) 100%);
-  border: 1px solid rgba(40,160,230,.22);
-  box-shadow: 0 0 28px rgba(40,160,230,.08), inset 0 0 60px rgba(40,160,230,.04);
-}
-.hero-portal-oceans::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 40% at 50% 10%, rgba(60,180,255,.14) 0%, transparent 65%),
-    radial-gradient(ellipse 60% 50% at 30% 55%, rgba(20,100,200,.10) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 70% 75%, rgba(10,60,160,.08) 0%, transparent 60%);
-  pointer-events: none;
-}
-.hero-portal-oceans:hover {
-  transform: translateY(-4px);
-  border-color: rgba(40,160,230,.55);
-  background: linear-gradient(170deg, rgba(4,16,48,1) 0%, rgba(1,8,30,1) 100%);
-  box-shadow: 0 8px 40px rgba(40,160,230,.18), inset 0 0 60px rgba(40,160,230,.07);
-}
-
-/* Stars */
-.hero-portal-stars {
-  background: linear-gradient(170deg, rgba(8,2,30,1) 0%, rgba(3,0,15,1) 100%);
-  border: 1px solid rgba(150,90,255,.22);
-  box-shadow: 0 0 28px rgba(150,90,255,.08), inset 0 0 60px rgba(150,90,255,.04);
-}
-.hero-portal-stars::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 3px 3px at 18% 22%, rgba(255,255,255,.7) 0%, transparent 100%),
-    radial-gradient(ellipse 2px 2px at 45% 15%, rgba(255,255,255,.5) 0%, transparent 100%),
-    radial-gradient(ellipse 2px 2px at 72% 30%, rgba(255,255,255,.6) 0%, transparent 100%),
-    radial-gradient(ellipse 3px 3px at 85% 12%, rgba(255,255,255,.4) 0%, transparent 100%),
-    radial-gradient(ellipse 2px 2px at 30% 55%, rgba(255,255,255,.5) 0%, transparent 100%),
-    radial-gradient(ellipse 2px 2px at 60% 65%, rgba(255,255,255,.4) 0%, transparent 100%),
-    radial-gradient(ellipse 3px 3px at 92% 58%, rgba(255,255,255,.6) 0%, transparent 100%),
-    radial-gradient(ellipse 2px 2px at 12% 78%, rgba(255,255,255,.4) 0%, transparent 100%),
-    radial-gradient(ellipse 2px 2px at 78% 85%, rgba(255,255,255,.5) 0%, transparent 100%),
-    radial-gradient(ellipse 80% 50% at 50% 40%, rgba(100,50,200,.10) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero-portal-stars:hover {
-  transform: translateY(-4px);
-  border-color: rgba(150,90,255,.55);
-  background: linear-gradient(170deg, rgba(12,4,42,1) 0%, rgba(5,1,22,1) 100%);
-  box-shadow: 0 8px 40px rgba(150,90,255,.18), inset 0 0 60px rgba(150,90,255,.07);
-}
-
-.hero-portal-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  position: relative;
-  z-index: 1;
-}
-
-.hero-portal-name {
-  font-family: 'Palatino Linotype', Georgia, serif;
-  font-size: clamp(1.1rem, 1.8vw, 1.4rem);
-  font-weight: 300;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #fff;
-  margin-bottom: 0.5rem;
-  position: relative;
-  z-index: 1;
-}
-
-.hero-portal-sub {
-  font-size: 0.8rem;
-  color: rgba(255,255,255,.42);
-  letter-spacing: 0.04em;
-  line-height: 1.6;
-  flex: 1;
-  position: relative;
-  z-index: 1;
-}
-
-.hero-portal-arrow {
-  font-size: 1.1rem;
-  color: rgba(255,255,255,.28);
-  margin-top: 1.4rem;
-  position: relative;
-  z-index: 1;
-  transition: color .2s;
-  align-self: flex-end;
-}
-.hero-portal-continents:hover .hero-portal-arrow { color: rgba(80,200,100,.85); }
-.hero-portal-oceans:hover .hero-portal-arrow { color: rgba(40,160,230,.85); }
-.hero-portal-stars:hover .hero-portal-arrow { color: rgba(150,90,255,.85); }
-
-@media (max-width: 680px) {
-  .hero-portals {
-    flex-direction: column;
-    align-items: center;
-    min-height: auto;
-    padding-bottom: 4rem;
-  }
-  .hero-portal-card {
-    max-width: 100%;
-    min-height: 180px;
-    width: 100%;
-  }
 }
 
 /* ── SHARED SECTION STYLES ── */
@@ -317,6 +145,73 @@ h1.atlas-title {
   font-size: 0.97rem;
 }
 
+/* ── PORTALS ── */
+.portals {
+  background: rgba(0,0,10,.88);
+  padding: 5rem 2rem 4.5rem;
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  max-width: 1060px;
+  margin: 0 auto;
+}
+
+.portal-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  padding: 2.4rem 2rem;
+  text-decoration: none;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(255,255,255,.03);
+  transition: transform .28s, border-color .28s, background .28s;
+}
+
+.portal-card:hover { transform: translateY(-6px); }
+
+.portal-continents { border-color: rgba(80,200,100,.18); }
+.portal-continents:hover { border-color: rgba(80,200,100,.45); background: rgba(80,200,100,.07); }
+
+.portal-oceans { border-color: rgba(40,160,230,.18); }
+.portal-oceans:hover { border-color: rgba(40,160,230,.45); background: rgba(40,160,230,.07); }
+
+.portal-space { border-color: rgba(150,90,255,.18); }
+.portal-space:hover { border-color: rgba(150,90,255,.45); background: rgba(150,90,255,.07); }
+
+.portal-icon { font-size: 2.6rem; margin-bottom: 1rem; }
+
+.portal-card h3 {
+  font-family: 'Palatino Linotype', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.65rem;
+}
+
+.portal-card p {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,.46);
+  line-height: 1.72;
+  flex: 1;
+  margin-bottom: 1.6rem;
+}
+
+.portal-enter {
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  transition: color .2s;
+}
+
+.portal-continents:hover .portal-enter { color: rgba(80,200,100,.85); }
+.portal-oceans:hover .portal-enter { color: rgba(40,160,230,.85); }
+.portal-space:hover .portal-enter { color: rgba(150,90,255,.85); }
 
 /* ── FEATURES ── */
 .features {
@@ -477,41 +372,43 @@ footer a:hover { color: rgba(255,255,255,.5); }
 
   <!-- ── HERO ── -->
   <section class="hero">
+    <h1 class="atlas-title">Project Atlas</h1>
+    <p class="hero-tagline">Explore &nbsp;·&nbsp; Learn &nbsp;·&nbsp; Connect</p>
+    <p class="hero-desc">A geography adventure that takes you to every corner of the world. Discover 195 countries, master their capitals, collect national pets, and build your global base camp.</p>
 
-    <!-- Zone 1: compact header -->
-    <div class="hero-header">
-      <h1 class="atlas-title">Project Atlas</h1>
-      <p class="hero-tagline">Explore &nbsp;·&nbsp; Learn &nbsp;·&nbsp; Connect</p>
-      <p class="hero-desc">A geography adventure that takes you to every corner of the world. Discover 195 countries, master their capitals, collect national pets, and build your global base camp.</p>
-      <div class="store-pills">
-        <span class="store-pill">🍎&nbsp; Coming to iOS</span>
-        <span class="store-pill">🤖&nbsp; Coming to Android</span>
-      </div>
-    </div>
-
-    <!-- Zone 2: portal cards -->
-    <div class="hero-portals">
-      <a href="continents.html" class="hero-portal-card hero-portal-continents">
-        <div class="hero-portal-icon">🌍</div>
-        <div class="hero-portal-name">Continents</div>
-        <div class="hero-portal-sub">195 countries · 7 continents</div>
-        <span class="hero-portal-arrow">→</span>
-      </a>
-      <a href="oceans.html" class="hero-portal-card hero-portal-oceans">
-        <div class="hero-portal-icon">🌊</div>
-        <div class="hero-portal-name">Oceans</div>
-        <div class="hero-portal-sub">5 oceans · Endless depths</div>
-        <span class="hero-portal-arrow">→</span>
-      </a>
-      <a href="space.html" class="hero-portal-card hero-portal-stars">
-        <div class="hero-portal-icon">✦</div>
-        <div class="hero-portal-name">Stars</div>
-        <div class="hero-portal-sub">8 planets · 88 constellations</div>
-        <span class="hero-portal-arrow">→</span>
-      </a>
+    <div class="store-pills">
+      <span class="store-pill">🍎&nbsp; Coming to iOS</span>
+      <span class="store-pill">🤖&nbsp; Coming to Android</span>
     </div>
 
     <div class="scroll-cue">↓ &nbsp; discover more</div>
+  </section>
+
+  <!-- ── PORTALS ── -->
+  <section class="portals">
+    <p class="section-label">Three portals</p>
+    <h2 class="section-title">Where will you explore?</h2>
+    <p class="section-sub">Each portal is a world unto itself. Choose one and begin your Atlas journey.</p>
+    <div class="portal-grid">
+      <a href="continents.html" class="portal-card portal-continents">
+        <div class="portal-icon">🌍</div>
+        <h3>Continents</h3>
+        <p>Explore 195 countries across 7 continents. Place them on the map, discover their capitals, and meet their national animals.</p>
+        <span class="portal-enter">Enter Portal →</span>
+      </a>
+      <a href="oceans.html" class="portal-card portal-oceans">
+        <div class="portal-icon">🌊</div>
+        <h3>Oceans</h3>
+        <p>Dive beneath the surface of Earth's five oceans. Discover their depths, ecosystems, and the mysteries they hold.</p>
+        <span class="portal-enter">Enter Portal →</span>
+      </a>
+      <a href="space.html" class="portal-card portal-space">
+        <div class="portal-icon">✦</div>
+        <h3>Stars</h3>
+        <p>Journey beyond Earth into the cosmos. Explore planets, constellations, and the infinite universe above us all.</p>
+        <span class="portal-enter">Enter Portal →</span>
+      </a>
+    </div>
   </section>
 
   <!-- ── FEATURES ── -->
