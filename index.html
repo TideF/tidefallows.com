@@ -362,6 +362,8 @@ footer a:hover { color: rgba(255,255,255,.5); }
   .feature-grid { grid-template-columns: 1fr; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/d3-geo@3/dist/d3-geo.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
 </head>
 <body>
 
@@ -596,129 +598,21 @@ function resizeEarth() {
 }
 resizeEarth(); window.addEventListener('resize', resizeEarth);
 
-const LAND = [
-  // Africa
-  [[-6,36],[-2,35],[3,37],[9,37],[13,37],[18,34],[22,31],[26,31],[30,30],[32,28],[37,22],
-   [43,12],[51,11],[45,10],[44,4],[42,2],[40,-2],[39,-7],[35,-17],[34,-22],[32,-26],[28,-31],
-   [24,-34],[20,-35],[18,-34],[16,-29],[13,-24],[10,-18],[8,-10],[5,-5],[2,0],[1,5],[3,6],
-   [2,5],[-2,5],[-8,5],[-10,8],[-13,10],[-15,12],[-17,14],[-15,18],[-14,22],[-17,26],
-   [-13,28],[-8,29],[-3,32],[-2,33],[-6,36]],
-  // Europe
-  [[-9,36],[-6,36],[-2,33],[3,37],[6,44],[8,44],[12,44],[14,42],[16,38],[18,40],[20,38],
-   [22,37],[26,38],[28,36],[30,37],[36,37],[36,42],[38,45],[40,47],[36,48],[28,53],[24,55],
-   [18,57],[14,58],[10,58],[5,58],[0,56],[-5,56],[-8,52],[-10,48],[-9,44],[-9,40],[-9,36]],
-  // Asia
-  [[36,37],[42,37],[45,40],[50,40],[55,42],[60,44],[65,42],[70,38],[72,25],[78,8],[80,12],
-   [85,22],[90,22],[95,18],[100,5],[104,1],[108,5],[110,10],[115,22],[120,25],[122,30],
-   [125,35],[128,38],[130,42],[135,45],[140,42],[142,47],[145,48],[140,55],[135,58],[140,65],
-   [140,72],[120,73],[100,73],[80,72],[72,72],[68,68],[58,68],[52,65],[48,58],[42,50],
-   [38,48],[34,48],[30,50],[28,53],[24,55],[18,57],[22,55],[28,53],[36,48],[40,47],[38,45],
-   [36,42],[36,37]],
-  // North America
-  [[-168,72],[-140,70],[-120,60],[-130,56],[-126,50],[-124,42],[-120,38],[-117,32],
-   [-110,24],[-97,20],[-88,18],[-84,10],[-79,8],[-80,9],[-85,16],[-88,18],[-90,20],
-   [-87,22],[-95,25],[-97,20],[-110,24],[-120,38],[-124,42],[-124,48],[-130,56],
-   [-120,60],[-100,65],[-80,70],[-70,72],[-60,70],[-55,68],[-60,60],[-65,58],[-70,55],
-   [-73,50],[-65,45],[-60,47],[-65,52],[-70,55],[-75,52],[-82,43],[-80,44],[-76,44],
-   [-75,46],[-68,52],[-64,48],[-60,52],[-55,62],[-50,65],[-55,68],[-65,70],[-80,73],
-   [-100,75],[-120,72],[-140,72],[-168,72]],
-  // South America
-  [[-77,8],[-73,11],[-68,12],[-62,10],[-58,8],[-52,4],[-50,0],[-35,-5],[-34,-8],
-   [-38,-15],[-40,-20],[-44,-23],[-48,-28],[-52,-33],[-56,-38],[-60,-44],[-65,-52],
-   [-68,-54],[-72,-50],[-72,-45],[-70,-40],[-68,-38],[-68,-30],[-70,-20],[-75,-10],
-   [-78,0],[-80,5],[-77,8]],
-  // Australia
-  [[114,-22],[116,-20],[120,-18],[124,-14],[128,-14],[132,-12],[136,-14],[138,-14],
-   [138,-18],[140,-22],[145,-18],[148,-20],[150,-24],[153,-28],[152,-28],[150,-30],
-   [152,-32],[152,-36],[148,-38],[144,-38],[140,-36],[136,-36],[130,-34],[126,-34],
-   [114,-34],[114,-28],[114,-22]],
-  // Greenland
-  [[-22,76],[-18,76],[-15,78],[-20,83],[-30,84],[-40,84],[-50,82],[-55,78],
-   [-50,74],[-44,72],[-35,68],[-22,68],[-20,70],[-22,72],[-22,76]],
-  // Great Britain
-  [[-5,50],[-3,50],[0,51],[2,52],[0,54],[-2,56],[-5,58],[-6,58],[-5,55],[-3,53],[-3,51],[-5,50]],
-  // Japan (Honshu)
-  [[130,31],[132,33],[134,35],[136,36],[138,37],[140,38],[141,40],[141,41],[140,42],
-   [138,40],[136,38],[134,35],[132,33],[130,31]],
-  // New Zealand
-  [[172,-34],[175,-37],[177,-38],[178,-38],[176,-36],[174,-35],[172,-34]],
-];
-
-const ANTARCTICA = [
-  [-180,-68],[-150,-72],[-120,-74],[-90,-72],[-60,-72],[-30,-72],
-  [0,-72],[30,-72],[60,-70],[90,-70],[120,-72],[150,-70],[180,-68],
-  [180,-90],[-180,-90]
-];
-
-const DESERT = [
-  [0,32],[5,34],[10,33],[15,32],[20,30],[25,28],[30,26],[35,24],
-  [40,22],[45,20],[50,18],[55,22],[50,26],[45,28],[40,30],[35,32],
-  [30,34],[25,34],[20,34],[15,35],[10,36],[5,36],[0,35]
-];
-
-function _cosC(lon, lat, cLon, cLat) {
-  const φ=lat*Math.PI/180, λ=lon*Math.PI/180;
-  const φ0=cLat*Math.PI/180, λ0=cLon*Math.PI/180;
-  return Math.sin(φ0)*Math.sin(φ)+Math.cos(φ0)*Math.cos(φ)*Math.cos(λ-λ0);
-}
-
-function _projectPt(lon, lat, cLon, cLat, cx, cy, R) {
-  const φ=lat*Math.PI/180, λ=lon*Math.PI/180;
-  const φ0=cLat*Math.PI/180, λ0=cLon*Math.PI/180;
-  return [
-    cx + R*Math.cos(φ)*Math.sin(λ-λ0),
-    cy - R*(Math.cos(φ0)*Math.sin(φ) - Math.sin(φ0)*Math.cos(φ)*Math.cos(λ-λ0))
-  ];
-}
-
-function _horizonCross(lon1, lat1, lon2, lat2, cLon, cLat) {
-  // Binary search for the lon/lat where visibility cosC crosses zero
-  const c0 = _cosC(lon1, lat1, cLon, cLat);
-  let lo = 0, hi = 1;
-  for (let i = 0; i < 20; i++) {
-    const mid = (lo+hi)/2;
-    const lm = lon1 + mid*(lon2-lon1), ltm = lat1 + mid*(lat2-lat1);
-    if ((_cosC(lm, ltm, cLon, cLat) >= 0) === (c0 >= 0)) lo = mid; else hi = mid;
-  }
-  const t = (lo+hi)/2;
-  return [lon1 + t*(lon2-lon1), lat1 + t*(lat2-lat1)];
-}
-
-function project(lon, lat, cLon, cLat, cx, cy, R) {
-  if (_cosC(lon, lat, cLon, cLat) < 0) return null;
-  return _projectPt(lon, lat, cLon, cLat, cx, cy, R);
-}
-
-function drawPoly(ctx, coords, cLon, cLat, cx, cy, R) {
-  ctx.beginPath();
-  const n = coords.length;
-  // Sutherland-Hodgman clip: produces a single closed polygon so there are
-  // no disconnected subpaths that cause shapes to jump as vertices cross the horizon
-  const out = [];
-  for (let i = 0; i < n; i++) {
-    const [lon1, lat1] = coords[i];
-    const [lon2, lat2] = coords[(i+1) % n];
-    const v1 = _cosC(lon1, lat1, cLon, cLat) >= 0;
-    const v2 = _cosC(lon2, lat2, cLon, cLat) >= 0;
-    if (v1) out.push([lon1, lat1]);
-    if (v1 !== v2) out.push(_horizonCross(lon1, lat1, lon2, lat2, cLon, cLat));
-  }
-  if (out.length === 0) return;
-  const p0 = _projectPt(out[0][0], out[0][1], cLon, cLat, cx, cy, R);
-  ctx.moveTo(p0[0], p0[1]);
-  for (let i = 1; i < out.length; i++) {
-    const p = _projectPt(out[i][0], out[i][1], cLon, cLat, cx, cy, R);
-    ctx.lineTo(p[0], p[1]);
-  }
-  ctx.closePath();
-}
+let worldLand = null;
+fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json')
+  .then(r => r.json())
+  .then(topo => { worldLand = topojson.feature(topo, topo.objects.land); });
 
 let earthLon = -30;
 function drawEarth() {
   const sz=eC.width, cx=sz/2, cy=sz/2, R=sz*.47;
-  const cLon=earthLon, cLat=20;
-  eX.clearRect(0,0,sz,sz);
 
+  const proj = d3.geoOrthographic()
+    .scale(R).translate([cx,cy])
+    .rotate([-earthLon,-20,0]).clipAngle(90);
+  const path = d3.geoPath(proj, eX);
+
+  eX.clearRect(0,0,sz,sz);
   eX.save();
   eX.beginPath(); eX.arc(cx,cy,R,0,Math.PI*2); eX.clip();
 
@@ -727,33 +621,21 @@ function drawEarth() {
   ocean.addColorStop(.75,'#0e4278'); ocean.addColorStop(1,'#07224a');
   eX.fillStyle=ocean; eX.fillRect(0,0,sz,sz);
 
-  drawPoly(eX, ANTARCTICA, cLon, cLat, cx, cy, R);
-  const iceGrad=eX.createLinearGradient(0,cy,0,sz);
-  iceGrad.addColorStop(0,'#cce8f8'); iceGrad.addColorStop(1,'#eaf4ff');
-  eX.fillStyle=iceGrad; eX.fill();
-
-  const landGrad=eX.createRadialGradient(cx-R*.1,cy-R*.25,0,cx,cy,R*1.1);
-  landGrad.addColorStop(0,'#5a9e48'); landGrad.addColorStop(.4,'#4a8838');
-  landGrad.addColorStop(.8,'#3a6828'); landGrad.addColorStop(1,'#2a4818');
-  LAND.forEach(shape => {
-    drawPoly(eX, shape, cLon, cLat, cx, cy, R);
+  if (worldLand) {
+    const landGrad=eX.createRadialGradient(cx-R*.1,cy-R*.25,0,cx,cy,R*1.1);
+    landGrad.addColorStop(0,'#5a9e48'); landGrad.addColorStop(.4,'#4a8838');
+    landGrad.addColorStop(.8,'#3a6828'); landGrad.addColorStop(1,'#2a4818');
+    eX.beginPath(); path(worldLand);
     eX.fillStyle=landGrad; eX.fill();
     eX.strokeStyle='rgba(40,90,30,.3)'; eX.lineWidth=0.6; eX.stroke();
-  });
-
-  eX.globalAlpha=0.22;
-  drawPoly(eX, DESERT, cLon, cLat, cx, cy, R);
-  eX.fillStyle='#d4a84b'; eX.fill();
-  eX.globalAlpha=1;
-
-  const np=project(0,88,cLon,cLat,cx,cy,R);
-  if(np) {
-    const iceN=eX.createRadialGradient(np[0],np[1],0,np[0],np[1],R*.2);
-    iceN.addColorStop(0,'rgba(230,245,255,.92)');
-    iceN.addColorStop(.55,'rgba(210,235,255,.6)');
-    iceN.addColorStop(1,'transparent');
-    eX.fillStyle=iceN; eX.fillRect(0,0,sz,sz);
   }
+
+  const np=proj([0,88]);
+  const iceN=eX.createRadialGradient(np[0],np[1],0,np[0],np[1],R*.2);
+  iceN.addColorStop(0,'rgba(230,245,255,.92)');
+  iceN.addColorStop(.55,'rgba(210,235,255,.6)');
+  iceN.addColorStop(1,'transparent');
+  eX.fillStyle=iceN; eX.fillRect(0,0,sz,sz);
 
   const shadow=eX.createRadialGradient(cx-R*.45,cy+R*.45,R*.08,cx-R*.2,cy+R*.25,R*1.05);
   shadow.addColorStop(0,'rgba(0,0,20,.74)'); shadow.addColorStop(.4,'rgba(0,0,15,.46)');
