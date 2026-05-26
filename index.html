@@ -671,14 +671,25 @@ function drawEarth() {
       for (let i=0;i<n;i++) {
         const [lo1,la1]=ring[i], [lo2,la2]=ring[(i+1)%n];
         const v1=_cosC(lo1,la1,cLon,cLat)>=0, v2=_cosC(lo2,la2,cLon,cLat)>=0;
-        if (v1) out.push(ring[i]);
-        if (v1!==v2) out.push(_horizonCross(lo1,la1,lo2,la2,cLon,cLat));
+        if (v1) out.push([ring[i][0],ring[i][1],false]);
+        if (v1!==v2) { const h=_horizonCross(lo1,la1,lo2,la2,cLon,cLat); out.push([h[0],h[1],true]); }
       }
       if (!out.length) continue;
-      const p0=_projectPt(out[0][0],out[0][1],cLon,cLat,cx,cy,R);
-      eX.moveTo(p0[0],p0[1]);
+      const pts=out.map(pt=>_projectPt(pt[0],pt[1],cLon,cLat,cx,cy,R));
+      eX.moveTo(pts[0][0],pts[0][1]);
       for (let i=1;i<out.length;i++) {
-        const p=_projectPt(out[i][0],out[i][1],cLon,cLat,cx,cy,R); eX.lineTo(p[0],p[1]);
+        if (out[i-1][2]&&out[i][2]) {
+          const a1=Math.atan2(pts[i-1][1]-cy,pts[i-1][0]-cx);
+          const a2=Math.atan2(pts[i][1]-cy,pts[i][0]-cx);
+          const cw=(a2-a1+2*Math.PI)%(2*Math.PI);
+          eX.arc(cx,cy,R,a1,a2,cw>=Math.PI);
+        } else { eX.lineTo(pts[i][0],pts[i][1]); }
+      }
+      if (out.length>1&&out[out.length-1][2]&&out[0][2]) {
+        const a1=Math.atan2(pts[pts.length-1][1]-cy,pts[pts.length-1][0]-cx);
+        const a2=Math.atan2(pts[0][1]-cy,pts[0][0]-cx);
+        const cw=(a2-a1+2*Math.PI)%(2*Math.PI);
+        eX.arc(cx,cy,R,a1,a2,cw>=Math.PI);
       }
       eX.closePath();
     }
