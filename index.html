@@ -362,8 +362,6 @@ footer a:hover { color: rgba(255,255,255,.5); }
   .feature-grid { grid-template-columns: 1fr; }
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/d3-geo@3/dist/d3-geo.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
 </head>
 <body>
 
@@ -598,44 +596,101 @@ function resizeEarth() {
 }
 resizeEarth(); window.addEventListener('resize', resizeEarth);
 
-let worldLand = null;
+// Fetch Natural Earth 110m land TopoJSON and decode into polygon rings without
+// any external library — just a minimal inline TopoJSON decoder
+let landRings = null;
 fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json')
   .then(r => r.json())
-  .then(topo => { worldLand = topojson.feature(topo, topo.objects.land); });
+  .then(topo => {
+    const sc = topo.transform.scale, tr = topo.transform.translate;
+    const arcs = topo.arcs.map(arc => {
+      let x = 0, y = 0;
+      return arc.map(p => { x += p[0]; y += p[1]; return [x*sc[0]+tr[0], y*sc[1]+tr[1]]; });
+    });
+    function decodeRing(indices) {
+      const pts = [];
+      for (const idx of indices) {
+        const arc = idx < 0 ? [...arcs[~idx]].reverse() : arcs[idx];
+        for (let i = 0; i < arc.length - 1; i++) pts.push(arc[i]);
+      }
+      return pts;
+    }
+    const rings = [];
+    function addGeom(g) {
+      if (!g) return;
+      if (g.type === 'Polygon') g.arcs.forEach(r => rings.push(decodeRing(r)));
+      else if (g.type === 'MultiPolygon') g.arcs.forEach(p => p.forEach(r => rings.push(decodeRing(r))));
+      else if (g.type === 'GeometryCollection') g.geometries.forEach(addGeom);
+    }
+    addGeom(topo.objects.land);
+    landRings = rings;
+  });
+
+function _cosC(lon, lat, cLon, cLat) {
+  const φ=lat*Math.PI/180, λ=lon*Math.PI/180;
+  const φ0=cLat*Math.PI/180, λ0=cLon*Math.PI/180;
+  return Math.sin(φ0)*Math.sin(φ)+Math.cos(φ0)*Math.cos(φ)*Math.cos(λ-λ0);
+}
+function _projectPt(lon, lat, cLon, cLat, cx, cy, R) {
+  const φ=lat*Math.PI/180, λ=lon*Math.PI/180;
+  const φ0=cLat*Math.PI/180, λ0=cLon*Math.PI/180;
+  return [cx + R*Math.cos(φ)*Math.sin(λ-λ0),
+          cy - R*(Math.cos(φ0)*Math.sin(φ) - Math.sin(φ0)*Math.cos(φ)*Math.cos(λ-λ0))];
+}
+function _horizonCross(lon1, lat1, lon2, lat2, cLon, cLat) {
+  const c0 = _cosC(lon1, lat1, cLon, cLat);
+  let lo = 0, hi = 1;
+  for (let i = 0; i < 20; i++) {
+    const mid = (lo+hi)/2, lm = lon1+mid*(lon2-lon1), ltm = lat1+mid*(lat2-lat1);
+    if ((_cosC(lm,ltm,cLon,cLat)>=0)===(c0>=0)) lo=mid; else hi=mid;
+  }
+  const t=(lo+hi)/2; return [lon1+t*(lon2-lon1), lat1+t*(lat2-lat1)];
+}
 
 let earthLon = -30;
 function drawEarth() {
-  const sz=eC.width, cx=sz/2, cy=sz/2, R=sz*.47;
-
-  const proj = d3.geoOrthographic()
-    .scale(R).translate([cx,cy])
-    .rotate([-earthLon,-20,0]).clipAngle(90);
-  const path = d3.geoPath(proj, eX);
-
+  const sz=eC.width, cx=sz/2, cy=sz/2, R=sz*.47, cLon=earthLon, cLat=20;
   eX.clearRect(0,0,sz,sz);
   eX.save();
   eX.beginPath(); eX.arc(cx,cy,R,0,Math.PI*2); eX.clip();
 
+  // Ocean — always draws, no dependencies
   const ocean=eX.createRadialGradient(cx-R*.15,cy-R*.2,0,cx,cy,R);
   ocean.addColorStop(0,'#3a8fcf'); ocean.addColorStop(.35,'#1e6aaa');
   ocean.addColorStop(.75,'#0e4278'); ocean.addColorStop(1,'#07224a');
   eX.fillStyle=ocean; eX.fillRect(0,0,sz,sz);
 
-  if (worldLand) {
+  // Land — draws once JSON is fetched and decoded
+  if (landRings) {
     const landGrad=eX.createRadialGradient(cx-R*.1,cy-R*.25,0,cx,cy,R*1.1);
     landGrad.addColorStop(0,'#5a9e48'); landGrad.addColorStop(.4,'#4a8838');
     landGrad.addColorStop(.8,'#3a6828'); landGrad.addColorStop(1,'#2a4818');
-    eX.beginPath(); path(worldLand);
+    eX.beginPath();
+    for (const ring of landRings) {
+      const n=ring.length, out=[];
+      for (let i=0;i<n;i++) {
+        const [lo1,la1]=ring[i], [lo2,la2]=ring[(i+1)%n];
+        const v1=_cosC(lo1,la1,cLon,cLat)>=0, v2=_cosC(lo2,la2,cLon,cLat)>=0;
+        if (v1) out.push(ring[i]);
+        if (v1!==v2) out.push(_horizonCross(lo1,la1,lo2,la2,cLon,cLat));
+      }
+      if (!out.length) continue;
+      const p0=_projectPt(out[0][0],out[0][1],cLon,cLat,cx,cy,R);
+      eX.moveTo(p0[0],p0[1]);
+      for (let i=1;i<out.length;i++) {
+        const p=_projectPt(out[i][0],out[i][1],cLon,cLat,cx,cy,R); eX.lineTo(p[0],p[1]);
+      }
+      eX.closePath();
+    }
     eX.fillStyle=landGrad; eX.fill();
     eX.strokeStyle='rgba(40,90,30,.3)'; eX.lineWidth=0.6; eX.stroke();
   }
 
-  const np=proj([0,88]);
+  // North pole ice glow (pole is always visible at cLat=20°N)
+  const np=_projectPt(0,88,cLon,cLat,cx,cy,R);
   const iceN=eX.createRadialGradient(np[0],np[1],0,np[0],np[1],R*.2);
-  iceN.addColorStop(0,'rgba(230,245,255,.92)');
-  iceN.addColorStop(.55,'rgba(210,235,255,.6)');
-  iceN.addColorStop(1,'transparent');
-  eX.fillStyle=iceN; eX.fillRect(0,0,sz,sz);
+  iceN.addColorStop(0,'rgba(230,245,255,.92)'); iceN.addColorStop(.55,'rgba(210,235,255,.6)');
+  iceN.addColorStop(1,'transparent'); eX.fillStyle=iceN; eX.fillRect(0,0,sz,sz);
 
   const shadow=eX.createRadialGradient(cx-R*.45,cy+R*.45,R*.08,cx-R*.2,cy+R*.25,R*1.05);
   shadow.addColorStop(0,'rgba(0,0,20,.74)'); shadow.addColorStop(.4,'rgba(0,0,15,.46)');
@@ -644,8 +699,7 @@ function drawEarth() {
 
   const spec=eX.createRadialGradient(cx+R*.38,cy-R*.42,0,cx+R*.2,cy-R*.2,R*.9);
   spec.addColorStop(0,'rgba(255,255,255,.16)'); spec.addColorStop(.3,'rgba(255,255,255,.05)');
-  spec.addColorStop(1,'transparent');
-  eX.fillStyle=spec; eX.fillRect(0,0,sz,sz);
+  spec.addColorStop(1,'transparent'); eX.fillStyle=spec; eX.fillRect(0,0,sz,sz);
 
   const atm=eX.createRadialGradient(cx,cy,R*.96,cx,cy,R);
   atm.addColorStop(0,'transparent'); atm.addColorStop(1,'rgba(100,185,255,.25)');
@@ -655,8 +709,7 @@ function drawEarth() {
 
   const halo=eX.createRadialGradient(cx,cy,R*.97,cx,cy,R*1.1);
   halo.addColorStop(0,'rgba(80,160,255,.36)'); halo.addColorStop(.5,'rgba(60,130,220,.1)');
-  halo.addColorStop(1,'transparent');
-  eX.fillStyle=halo;
+  halo.addColorStop(1,'transparent'); eX.fillStyle=halo;
   eX.beginPath(); eX.arc(cx,cy,R*1.1,0,Math.PI*2); eX.fill();
 
   earthLon+=0.018;
