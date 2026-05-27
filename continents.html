@@ -454,7 +454,7 @@ function drawEarth() {
   const halo=eX.createRadialGradient(cx,cy,R*.97,cx,cy,R*1.1);
   halo.addColorStop(0,'rgba(80,160,255,.36)'); halo.addColorStop(.5,'rgba(60,130,220,.1)'); halo.addColorStop(1,'transparent');
   eX.fillStyle=halo; eX.beginPath(); eX.arc(cx,cy,R*1.1,0,Math.PI*2); eX.fill();
-  earthLon+=0.018;
+  earthLon+=0.06;
   requestAnimationFrame(drawEarth);
 }
 drawEarth();
