@@ -489,12 +489,6 @@ footer a:hover { color: rgba(255,255,255,.5); }
     </div>
   </section>
 
-  <!-- ── CTA ── -->
-  <section class="cta-section">
-    <h2>Coming soon</h2>
-    <p class="cta-sub">Atlas is launching on iOS and Android. Follow along as we build a world worth exploring.</p>
-  </section>
-
   <!-- ── FOOTER ── -->
   <footer>
     <p class="footer-logo">Project Atlas</p>
@@ -701,11 +695,6 @@ function drawEarth() {
     eX.strokeStyle='rgba(40,90,30,.3)'; eX.lineWidth=0.6; eX.stroke();
   }
 
-  // North pole ice glow (pole is always visible at cLat=20°N)
-  const np=_projectPt(0,88,cLon,cLat,cx,cy,R);
-  const iceN=eX.createRadialGradient(np[0],np[1],0,np[0],np[1],R*.2);
-  iceN.addColorStop(0,'rgba(230,245,255,.92)'); iceN.addColorStop(.55,'rgba(210,235,255,.6)');
-  iceN.addColorStop(1,'transparent'); eX.fillStyle=iceN; eX.fillRect(0,0,sz,sz);
 
   const shadow=eX.createRadialGradient(cx-R*.45,cy+R*.45,R*.08,cx-R*.2,cy+R*.25,R*1.05);
   shadow.addColorStop(0,'rgba(0,0,20,.74)'); shadow.addColorStop(.4,'rgba(0,0,15,.46)');
