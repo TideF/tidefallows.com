@@ -542,12 +542,12 @@ function drawSun(w,h) {
 
 const planets = [
   {rx:.13,ry:.055,T:7,   s:5,  c:'#b8b0a8', dk:'#181410', ph:.4},
-  {rx:.21,ry:.09, T:12,  s:9,  c:'#e8d888', dk:'#584815', atm:'rgba(230,200,80,.2)',  ph:1.8},
-  {rx:.35,ry:.15, T:28,  s:7,  c:'#c04010', dk:'#2c0804', atm:'rgba(180,60,20,.15)', ph:3.2, moons:1},
-  {rx:.52,ry:.22, T:65,  s:19, c:'#c89060', dk:'#281400', atm:'rgba(200,140,80,.22)',ph:5.1, bands:true},
-  {rx:.68,ry:.28, T:100, s:15, c:'#e0c870', dk:'#483808', atm:'rgba(220,190,80,.18)',ph:1.3, rings:true},
-  {rx:.82,ry:.34, T:140, s:11, c:'#72c8e0', dk:'#062838', atm:'rgba(80,200,230,.2)', ph:4.6},
-  {rx:.96,ry:.40, T:200, s:10, c:'#2850c8', dk:'#040810', atm:'rgba(40,80,220,.22)', ph:2.2},
+  {rx:.21,ry:.09, T:12,  s:9,  c:'#e8c84a', dk:'#3a2a08', ph:1.8},
+  {rx:.35,ry:.15, T:28,  s:7,  c:'#c04010', dk:'#2c0804', ph:3.2, moons:1},
+  {rx:.52,ry:.22, T:65,  s:19, c:'#c89060', dk:'#281400', ph:5.1, bands:true},
+  {rx:.68,ry:.28, T:100, s:15, c:'#e0c870', dk:'#483808', ph:1.3, rings:true},
+  {rx:.82,ry:.34, T:140, s:11, c:'#72c8e0', dk:'#062838', ph:4.6},
+  {rx:.96,ry:.40, T:200, s:10, c:'#2850c8', dk:'#040810', ph:2.2},
 ];
 
 function shade(hex,a) {
@@ -600,12 +600,12 @@ function drawBg() {
     if(p.rings) drawRingHalf(px,py,s,false);
 
     // sphere — physically lit highlight offset toward sun
-    const hx=px+lx*s*.42, hy=py+ly*s*.42;
+    const hx=px+lx*s*.45, hy=py+ly*s*.45;
     const pg=bgX.createRadialGradient(hx,hy,0,px,py,s);
-    pg.addColorStop(0,'rgba(255,255,255,.28)');
-    pg.addColorStop(.18,p.c);
-    pg.addColorStop(.62,shade(p.c,-35));
-    pg.addColorStop(1,p.dk||shade(p.c,-90));
+    pg.addColorStop(0,'rgba(255,255,255,.14)');
+    pg.addColorStop(.12,p.c);
+    pg.addColorStop(.55,shade(p.c,-45));
+    pg.addColorStop(1,p.dk||shade(p.c,-100));
     bgX.beginPath(); bgX.arc(px,py,s,0,Math.PI*2); bgX.fillStyle=pg; bgX.fill();
 
     // Jupiter bands
@@ -623,13 +623,6 @@ function drawBg() {
 
     // front rings after planet
     if(p.rings) drawRingHalf(px,py,s,true);
-
-    // atmospheric limb glow for gas giants
-    if(p.atm) {
-      const ag=bgX.createRadialGradient(px,py,s*.88,px,py,s*1.45);
-      ag.addColorStop(0,'transparent'); ag.addColorStop(1,p.atm);
-      bgX.beginPath(); bgX.arc(px,py,s*1.45,0,Math.PI*2); bgX.fillStyle=ag; bgX.fill();
-    }
 
     // moon
     if(p.moons) {
