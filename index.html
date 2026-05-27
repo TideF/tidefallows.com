@@ -25,6 +25,9 @@ body {
   height: 90vmin;
   z-index: 1;
 }
+@media (max-width: 600px) {
+  #earth { bottom: -12%; }
+}
 
 .page { position: relative; z-index: 10; }
 
@@ -390,11 +393,32 @@ footer a:hover { color: rgba(255,255,255,.5); }
 
 /* ── MOBILE ── */
 @media (max-width: 600px) {
-  .hero-portals { gap: 2rem; }
-  .portal-orb { width: 120px; height: 120px; }
-  .orb-icon { font-size: 1.6rem; }
+  /* Hero vertical padding — give Earth more room */
+  .hero { padding-top: 1.8rem; padding-bottom: 3rem; }
+
+  /* Portal orbs — one row, smaller */
+  .hero-portals { gap: 0.6rem; flex-wrap: nowrap; }
+  .portal-orb { width: 82px; height: 82px; }
+  .orb-icon { font-size: 1.1rem; }
+  .orb-label { font-size: 0.5rem; }
+
+  /* Section padding */
   .features, .how, .cta-section { padding-left: 1.2rem; padding-right: 1.2rem; }
-  .feature-grid { grid-template-columns: 1fr; }
+
+  /* Feature grid — 2-col, first card spans full width */
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .feature-card:first-child { grid-column: 1 / -1; }
+  .card-body { padding: 0.85rem 1rem 1rem; }
+  .feature-card h3 { font-size: 0.82rem; }
+  .feature-card p { font-size: 0.75rem; }
+
+  /* Steps grid — 2×2 layout */
+  .steps { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+  .step h3 { font-size: 0.82rem; }
+  .step p { font-size: 0.75rem; }
 }
 </style>
 </head>
@@ -531,8 +555,8 @@ const stars = Array.from({length:500}, () => ({
   a:Math.random()*.7+.3, da:(Math.random()*.004+.001)*(Math.random()>.5?1:-1)
 }));
 
-function drawSun(w,h) {
-  const sx=w*.93, sy=h*-.06, sr=Math.min(w,h)*.22;
+function drawSun(w,h,mScale) {
+  const sx=w*.93, sy=h*-.06, sr=Math.min(w,h)*.22*mScale;
   // outer corona — wide soft glow
   [[sr*5.5,.012],[sr*4,.025],[sr*2.9,.05],[sr*2,.1],[sr*1.4,.22]].forEach(([r,a]) => {
     const g=bgX.createRadialGradient(sx,sy,sr*.6,sx,sy,r);
@@ -593,6 +617,7 @@ function drawRingHalf(px,py,s,front) {
 let bgT=0;
 function drawBg() {
   const w=bgC.width, h=bgC.height;
+  const mScale = w <= 600 ? 0.6 : 1;
   bgX.clearRect(0,0,w,h);
   bgX.fillStyle='#00000c'; bgX.fillRect(0,0,w,h);
   const nb=bgX.createRadialGradient(w*.25,h*.45,0,w*.25,h*.45,w*.55);
@@ -606,10 +631,10 @@ function drawBg() {
     bgX.fillStyle=`rgba(255,255,255,${s.a.toFixed(2)})`; bgX.fill();
   });
 
-  drawSun(w,h);
+  drawSun(w,h,mScale);
   const cx=w*.93, cy=h*-.06;
   planets.forEach(p => {
-    const rx=p.rx*w, ry=p.ry*h, s=p.s;
+    const rx=p.rx*w, ry=p.ry*h, s=p.s*mScale;
     bgX.beginPath(); bgX.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
     bgX.strokeStyle='rgba(255,255,255,.05)'; bgX.lineWidth=.8; bgX.stroke();
     const ang=p.ph+bgT/p.T, px=cx+Math.cos(ang)*rx, py=cy+Math.sin(ang)*ry;
