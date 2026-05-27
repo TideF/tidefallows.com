@@ -252,7 +252,7 @@ h1.atlas-title {
 .feature-card {
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 14px;
-  padding: 1.8rem;
+  overflow: hidden;
   background: rgba(255,255,255,.03);
   transition: border-color .25s, background .25s, transform .25s;
 }
@@ -263,7 +263,17 @@ h1.atlas-title {
   transform: translateY(-3px);
 }
 
-.feature-icon { font-size: 2rem; margin-bottom: 0.9rem; }
+.feature-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+  filter: brightness(.85) saturate(1.1);
+}
+
+.card-body {
+  padding: 1.4rem 1.6rem 1.6rem;
+}
 
 .feature-card h3 {
   font-size: 1.05rem;
@@ -427,34 +437,46 @@ footer a:hover { color: rgba(255,255,255,.5); }
 
     <div class="feature-grid">
       <div class="feature-card">
-        <div class="feature-icon">🌍</div>
-        <h3>Three Portals</h3>
-        <p>Explore 195 countries in Continents, discover what lurks beneath the waves in Oceans, or launch into the universe in Stars. Each portal is its own world.</p>
+        <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=360&fit=crop&auto=format&q=80" alt="Earth from space">
+        <div class="card-body">
+          <h3>Three Portals</h3>
+          <p>Explore 195 countries in Continents, discover what lurks beneath the waves in Oceans, or launch into the universe in Stars. Each portal is its own world.</p>
+        </div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">📖</div>
-        <h3>Learn Before You Quiz</h3>
-        <p>Before every quiz, Atlas teaches you everything — where a country is on the map, its national animal, its famous food, and a rhyme to remember the capital.</p>
+        <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&h=360&fit=crop&auto=format&q=80" alt="World map">
+        <div class="card-body">
+          <h3>Learn Before You Quiz</h3>
+          <p>Before every quiz, Atlas teaches you everything — where a country is on the map, its national animal, its famous food, and a rhyme to remember the capital.</p>
+        </div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🏆</div>
-        <h3>Quiz Ladder</h3>
-        <p>Four levels: Easy, Medium, Hard, and Master. Each one you pass earns Atlas Orbs — your points. Reach Master and that place is marked as yours forever.</p>
+        <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=600&h=360&fit=crop&auto=format&q=80" alt="Quiz competition">
+        <div class="card-body">
+          <h3>Quiz Ladder</h3>
+          <p>Four levels: Easy, Medium, Hard, and Master. Each one you pass earns Atlas Orbs — your points. Reach Master and that place is marked as yours forever.</p>
+        </div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🐾</div>
-        <h3>195 National Pets</h3>
-        <p>Every country has a hidden animal companion. Ace the Hard quiz to unlock it — from Mexico's Axolotl to Japan's Shiba Inu. How many can you collect?</p>
+        <img src="https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=600&h=360&fit=crop&auto=format&q=80" alt="Wildlife animal">
+        <div class="card-body">
+          <h3>195 National Pets</h3>
+          <p>Every country has a hidden animal companion. Ace the Hard quiz to unlock it — from Mexico's Axolotl to Japan's Shiba Inu. How many can you collect?</p>
+        </div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🏠</div>
-        <h3>Your Base Camp</h3>
-        <p>Your own home inside Atlas. Pick a house style — a Japanese pagoda, a beach bungalow, or a mountain lodge — and fill it with your travel collection.</p>
+        <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=600&h=360&fit=crop&auto=format&q=80" alt="Cozy cabin">
+        <div class="card-body">
+          <h3>Your Base Camp</h3>
+          <p>Your own home inside Atlas. Pick a house style — a Japanese pagoda, a beach bungalow, or a mountain lodge — and fill it with your travel collection.</p>
+        </div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🛍️</div>
-        <h3>Regional Market</h3>
-        <p>Spend your Atlas Orbs on 1,365+ outfits and accessories from cultures all over the world. Dress your explorer however you like.</p>
+        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=360&fit=crop&auto=format&q=80" alt="Clothing market">
+        <div class="card-body">
+          <h3>Regional Market</h3>
+          <p>Spend your Atlas Orbs on 1,365+ outfits and accessories from cultures all over the world. Dress your explorer however you like.</p>
+        </div>
       </div>
     </div>
   </section>
