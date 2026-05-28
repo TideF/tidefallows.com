@@ -392,8 +392,8 @@ footer a:hover { color: rgba(255,255,255,.5); }
   /* Earth — show more of globe, keep it low so hero content clears it */
   #earth { bottom: 2%; }
 
-  /* Hero — short enough that content sits in top half, above the Earth */
-  .hero { min-height: 52vh; padding-top: 1.8rem; padding-bottom: 2rem; }
+  /* Hero — full viewport so fold stays off-screen; compact content sits above the Earth */
+  .hero { min-height: 100vh; padding-top: 1.8rem; padding-bottom: 2rem; }
 
   /* Hide long description so the hero stays compact */
   .hero-desc { display: none; }
@@ -686,7 +686,7 @@ function drawBg() {
       bgX.fillStyle='rgba(200,195,185,.9)'; bgX.fill();
     }
   });
-  bgT+=.012;
+  bgT+=.035;
   requestAnimationFrame(drawBg);
 }
 drawBg();
@@ -822,7 +822,7 @@ function drawEarth() {
   halo.addColorStop(1,'transparent'); eX.fillStyle=halo;
   eX.beginPath(); eX.arc(cx,cy,R*1.1,0,Math.PI*2); eX.fill();
 
-  earthLon+=0.06;
+  earthLon+=0.18;
   requestAnimationFrame(drawEarth);
 }
 drawEarth();
