@@ -686,7 +686,7 @@ function drawBg() {
       bgX.fillStyle='rgba(200,195,185,.9)'; bgX.fill();
     }
   });
-  bgT+=.035;
+  bgT+=.012;
   requestAnimationFrame(drawBg);
 }
 drawBg();
@@ -822,7 +822,7 @@ function drawEarth() {
   halo.addColorStop(1,'transparent'); eX.fillStyle=halo;
   eX.beginPath(); eX.arc(cx,cy,R*1.1,0,Math.PI*2); eX.fill();
 
-  earthLon+=0.18;
+  earthLon+=0.06;
   requestAnimationFrame(drawEarth);
 }
 drawEarth();
