@@ -565,31 +565,80 @@ const stars = Array.from({length:500}, () => ({
 
 function drawSun(w,h,mScale) {
   const sx=w*.93, sy=h*-.06, sr=Math.min(w,h)*.22*mScale;
-  // outer corona — wide soft glow
-  [[sr*5.5,.012],[sr*4,.025],[sr*2.9,.05],[sr*2,.1],[sr*1.4,.22]].forEach(([r,a]) => {
-    const g=bgX.createRadialGradient(sx,sy,sr*.6,sx,sy,r);
-    g.addColorStop(0,`rgba(255,210,60,${a})`);
-    g.addColorStop(.5,`rgba(255,160,20,${a*.5})`);
+
+  // Wide corona glow — multiple soft layers
+  [[sr*6,.008],[sr*4.5,.02],[sr*3,.05],[sr*2,.10],[sr*1.5,.22]].forEach(([r,a]) => {
+    const g=bgX.createRadialGradient(sx,sy,sr*.5,sx,sy,r);
+    g.addColorStop(0,`rgba(255,240,100,${a})`);
+    g.addColorStop(.4,`rgba(255,160,20,${a*.6})`);
     g.addColorStop(1,'transparent');
     bgX.fillStyle=g; bgX.fillRect(0,0,w,h);
   });
-  // disc — centered gradient for realistic limb darkening
+
+  // Corona rays — faint radial spikes slowly rotating
+  bgX.save();
+  for(let i=0;i<14;i++){
+    const ra=bgT*.006+i*(Math.PI*2/14);
+    const r1=sr*1.05, r2=sr*(1.85+Math.sin(bgT*.04+i)*0.45);
+    const g=bgX.createLinearGradient(
+      sx+Math.cos(ra)*r1,sy+Math.sin(ra)*r1,
+      sx+Math.cos(ra)*r2,sy+Math.sin(ra)*r2);
+    g.addColorStop(0,'rgba(255,220,80,.12)'); g.addColorStop(1,'transparent');
+    bgX.beginPath();
+    bgX.moveTo(sx+Math.cos(ra-.07)*r1,sy+Math.sin(ra-.07)*r1);
+    bgX.lineTo(sx+Math.cos(ra)*r2,sy+Math.sin(ra)*r2);
+    bgX.lineTo(sx+Math.cos(ra+.07)*r1,sy+Math.sin(ra+.07)*r1);
+    bgX.fillStyle=g; bgX.fill();
+  }
+  bgX.restore();
+
+  // Chromosphere ring — thin glowing halo just outside the disc
+  const chg=bgX.createRadialGradient(sx,sy,sr*.9,sx,sy,sr*1.2);
+  chg.addColorStop(0,'transparent');
+  chg.addColorStop(.35,'rgba(255,180,60,.28)');
+  chg.addColorStop(.75,'rgba(255,90,15,.08)');
+  chg.addColorStop(1,'transparent');
+  bgX.beginPath(); bgX.arc(sx,sy,sr*1.2,0,Math.PI*2); bgX.fillStyle=chg; bgX.fill();
+
+  // Solar prominences — arcs of plasma looping above the limb
+  bgX.save(); bgX.lineCap='round';
+  for(let i=0;i<5;i++){
+    const pa=bgT*.05+i*1.257;
+    const arcR=sr*(1.12+Math.sin(bgT*.09+i)*0.12);
+    const p1x=sx+Math.cos(pa)*sr*.97,     p1y=sy+Math.sin(pa)*sr*.97;
+    const p2x=sx+Math.cos(pa+.38)*sr*.97, p2y=sy+Math.sin(pa+.38)*sr*.97;
+    const cpx=sx+Math.cos(pa+.19)*arcR,   cpy=sy+Math.sin(pa+.19)*arcR;
+    bgX.beginPath(); bgX.moveTo(p1x,p1y); bgX.quadraticCurveTo(cpx,cpy,p2x,p2y);
+    bgX.strokeStyle=`rgba(255,110,15,${.35+Math.sin(bgT*.13+i)*.12})`;
+    bgX.lineWidth=sr*.045; bgX.stroke();
+  }
+  bgX.restore();
+
+  // Main disc — limb darkening from bright white centre to deep red edge
   const sg=bgX.createRadialGradient(sx,sy,0,sx,sy,sr);
-  sg.addColorStop(0,'#fff5c8');
-  sg.addColorStop(.28,'#ffe050');
-  sg.addColorStop(.55,'#ffaa20');
-  sg.addColorStop(.76,'#f06800');
-  sg.addColorStop(.91,'#c84000');
-  sg.addColorStop(1,'#8c2800');
+  sg.addColorStop(0,'#fff9e8');
+  sg.addColorStop(.22,'#ffec50');
+  sg.addColorStop(.48,'#ffb820');
+  sg.addColorStop(.70,'#f07000');
+  sg.addColorStop(.88,'#cc3800');
+  sg.addColorStop(1,'#8c2000');
   bgX.beginPath(); bgX.arc(sx,sy,sr,0,Math.PI*2); bgX.fillStyle=sg; bgX.fill();
-  // subtle granulation — slowly drifting bright cells
-  bgX.save(); bgX.beginPath(); bgX.arc(sx,sy,sr*.92,0,Math.PI*2); bgX.clip();
-  for(let i=0;i<8;i++){
-    const a=bgT*.25+i*Math.PI*.25, d=sr*.32;
-    const gx=sx+Math.cos(a)*d, gy=sy+Math.sin(a)*d;
-    const gr=bgX.createRadialGradient(gx,gy,0,gx,gy,sr*.2);
-    gr.addColorStop(0,'rgba(255,245,160,.07)'); gr.addColorStop(1,'transparent');
+
+  // Surface texture — granulation cells + moving sunspots
+  bgX.save(); bgX.beginPath(); bgX.arc(sx,sy,sr*.93,0,Math.PI*2); bgX.clip();
+  for(let i=0;i<20;i++){
+    const ga=bgT*.15+i*(Math.PI*2/20), gd=sr*(.12+((i*7919)%100)/100*.55);
+    const gx=sx+Math.cos(ga)*gd, gy=sy+Math.sin(ga)*gd;
+    const gr=bgX.createRadialGradient(gx,gy,0,gx,gy,sr*.15);
+    gr.addColorStop(0,'rgba(255,255,180,.15)'); gr.addColorStop(1,'transparent');
     bgX.fillStyle=gr; bgX.fillRect(sx-sr,sy-sr,sr*2,sr*2);
+  }
+  for(let i=0;i<3;i++){
+    const sa=bgT*.035+i*2.094, spd=sr*.33;
+    const spx=sx+Math.cos(sa)*spd, spy=sy+Math.sin(sa)*spd*.55;
+    const sp=bgX.createRadialGradient(spx,spy,0,spx,spy,sr*.08);
+    sp.addColorStop(0,'rgba(15,5,0,.72)'); sp.addColorStop(.5,'rgba(50,15,0,.38)'); sp.addColorStop(1,'transparent');
+    bgX.fillStyle=sp; bgX.fillRect(spx-sr*.1,spy-sr*.1,sr*.2,sr*.2);
   }
   bgX.restore();
 }
@@ -686,7 +735,7 @@ function drawBg() {
       bgX.fillStyle='rgba(200,195,185,.9)'; bgX.fill();
     }
   });
-  bgT+=.035;
+  bgT+=.07;
   requestAnimationFrame(drawBg);
 }
 drawBg();
