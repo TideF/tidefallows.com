@@ -241,26 +241,99 @@ const bgX = bgC.getContext('2d');
 function resizeBg() { bgC.width = innerWidth; bgC.height = innerHeight; }
 resizeBg(); window.addEventListener('resize', resizeBg);
 
-// Wave layer definitions: y-position factor, amplitude, period, speed, color
-const waveLayers = [
-  { yF: 0.52, amp: 28, period: 0.008, speed: 0.18, color: 'rgba(0,100,200,0.4)' },
-  { yF: 0.58, amp: 22, period: 0.010, speed: 0.13, color: 'rgba(0,80,170,0.45)' },
-  { yF: 0.46, amp: 18, period: 0.012, speed: 0.22, color: 'rgba(0,130,210,0.35)' },
-  { yF: 0.64, amp: 16, period: 0.007, speed: 0.10, color: 'rgba(0,60,140,0.5)' },
-  { yF: 0.40, amp: 14, period: 0.015, speed: 0.28, color: 'rgba(0,150,220,0.28)' },
-  { yF: 0.70, amp: 12, period: 0.009, speed: 0.08, color: 'rgba(0,40,110,0.55)' },
-  { yF: 0.34, amp: 10, period: 0.018, speed: 0.32, color: 'rgba(0,170,230,0.22)' },
-];
+// ── Fish ─────────────────────────────────────────────────────────────
+const FISH_COUNT = 12;
+function makeFish() {
+  const dir = Math.random() > 0.5 ? 1 : -1;
+  const size = Math.random() * 28 + 10;
+  return {
+    x: dir === 1 ? -size * 3 : 1 + size * 3 / innerWidth,
+    y: Math.random() * 0.75 + 0.12,
+    size,
+    speed: (Math.random() * 0.0012 + 0.0004) * dir,
+    dir,
+    tailT: Math.random() * Math.PI * 2,
+    tailSpeed: Math.random() * 0.12 + 0.08,
+    r: Math.floor(Math.random() * 60 + 20),
+    g: Math.floor(Math.random() * 100 + 80),
+    b: Math.floor(Math.random() * 80 + 140),
+    a: Math.random() * 0.35 + 0.45,
+    wobble: Math.random() * 0.0008 + 0.0002,
+    wobbleT: Math.random() * Math.PI * 2,
+  };
+}
+const fishes = Array.from({ length: FISH_COUNT }, makeFish);
 
-// Shimmer streaks near the surface
-const shimmerStreaks = Array.from({length: 18}, () => ({
+function drawFish(ctx, f, w, h) {
+  const x = f.x * w;
+  const y = f.y * h + Math.sin(f.wobbleT) * 18;
+  const s = f.size;
+  const tail = Math.sin(f.tailT) * 0.45;
+  ctx.save();
+  ctx.translate(x, y);
+  if (f.dir < 0) ctx.scale(-1, 1);
+  ctx.globalAlpha = f.a;
+
+  // body
+  ctx.beginPath();
+  ctx.ellipse(0, 0, s, s * 0.42, 0, 0, Math.PI * 2);
+  ctx.fillStyle = `rgb(${f.r},${f.g},${f.b})`;
+  ctx.fill();
+
+  // tail
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.82, 0);
+  ctx.lineTo(-s * 1.5, -s * 0.55 + tail * s * 0.6);
+  ctx.lineTo(-s * 1.5,  s * 0.55 + tail * s * 0.6);
+  ctx.closePath();
+  ctx.fillStyle = `rgb(${f.r},${f.g},${f.b})`;
+  ctx.fill();
+
+  // dorsal fin
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.1, -s * 0.42);
+  ctx.quadraticCurveTo(s * 0.15, -s * 0.85, s * 0.38, -s * 0.42);
+  ctx.closePath();
+  ctx.fillStyle = `rgba(${f.r},${f.g},${f.b},0.6)`;
+  ctx.fill();
+
+  // eye
+  ctx.beginPath();
+  ctx.arc(s * 0.45, -s * 0.07, s * 0.09, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.fill();
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+// ── Bubbles ────────────────────────────────────────────────────────────
+const bubbles = Array.from({ length: 30 }, () => ({
   x: Math.random(),
-  y: Math.random() * 0.38 + 0.05,
-  len: Math.random() * 0.12 + 0.04,
-  width: Math.random() * 3 + 1,
-  speed: (Math.random() * 0.004 + 0.001) * (Math.random() > 0.5 ? 1 : -1),
-  a: Math.random() * 0.5 + 0.1,
-  da: (Math.random() * 0.008 + 0.002) * (Math.random() > 0.5 ? 1 : -1),
+  y: Math.random(),
+  r: Math.random() * 4 + 1,
+  speed: Math.random() * 0.0006 + 0.0002,
+  wobble: Math.random() * 0.003 + 0.001,
+  wobbleT: Math.random() * Math.PI * 2,
+  a: Math.random() * 0.25 + 0.08,
+}));
+
+// ── Caustic rays ───────────────────────────────────────────────────────
+const rays = Array.from({ length: 8 }, (_, i) => ({
+  x: (i + 0.5) / 8 + (Math.random() - 0.5) * 0.06,
+  width: Math.random() * 0.04 + 0.015,
+  speed: (Math.random() * 0.0006 + 0.0002) * (Math.random() > 0.5 ? 1 : -1),
+  a: Math.random() * 0.07 + 0.03,
+}));
+
+// ── Particles (plankton) ───────────────────────────────────────────────
+const particles = Array.from({ length: 60 }, () => ({
+  x: Math.random(),
+  y: Math.random(),
+  r: Math.random() * 1.8 + 0.4,
+  vx: (Math.random() - 0.5) * 0.0003,
+  vy: -(Math.random() * 0.0003 + 0.0001),
+  a: Math.random() * 0.3 + 0.05,
 }));
 
 let bgT = 0;
@@ -268,77 +341,93 @@ function drawBg() {
   const w = bgC.width, h = bgC.height;
   bgX.clearRect(0, 0, w, h);
 
-  // Deep ocean gradient background
+  // Underwater gradient — dark abyss at bottom, lighter surface at top
   const bg = bgX.createLinearGradient(0, 0, 0, h);
-  bg.addColorStop(0, '#001a33');
-  bg.addColorStop(0.35, '#002244');
-  bg.addColorStop(0.65, '#003366');
-  bg.addColorStop(0.85, '#004080');
-  bg.addColorStop(1, '#003355');
+  bg.addColorStop(0,    '#004466');
+  bg.addColorStop(0.25, '#003355');
+  bg.addColorStop(0.55, '#002040');
+  bg.addColorStop(0.8,  '#001428');
+  bg.addColorStop(1,    '#000d1a');
   bgX.fillStyle = bg;
   bgX.fillRect(0, 0, w, h);
 
-  // Soft radial glow at mid-depth (bioluminescent hint)
-  const glow = bgX.createRadialGradient(w * 0.5, h * 0.55, 0, w * 0.5, h * 0.55, w * 0.6);
-  glow.addColorStop(0, 'rgba(0,80,160,0.18)');
-  glow.addColorStop(1, 'transparent');
-  bgX.fillStyle = glow;
-  bgX.fillRect(0, 0, w, h);
-
-  // Shimmer / caustic streaks near the surface
-  shimmerStreaks.forEach(s => {
-    s.x += s.speed * 0.004;
-    if (s.x > 1.1) s.x = -0.15;
-    if (s.x < -0.15) s.x = 1.1;
-    s.a += s.da;
-    if (s.a > 0.6) { s.a = 0.6; s.da = -Math.abs(s.da); }
-    if (s.a < 0.05) { s.a = 0.05; s.da = Math.abs(s.da); }
-    const sx = s.x * w, sy = s.y * h;
-    const angle = Math.PI * 0.08;
-    bgX.save();
-    bgX.translate(sx, sy);
-    bgX.rotate(angle);
-    const shimmerGrad = bgX.createLinearGradient(-s.len * w * 0.5, 0, s.len * w * 0.5, 0);
-    shimmerGrad.addColorStop(0, 'transparent');
-    shimmerGrad.addColorStop(0.3, `rgba(0,180,255,${(s.a * 0.15).toFixed(3)})`);
-    shimmerGrad.addColorStop(0.5, `rgba(0,180,255,${s.a.toFixed(3)})`);
-    shimmerGrad.addColorStop(0.7, `rgba(0,180,255,${(s.a * 0.15).toFixed(3)})`);
-    shimmerGrad.addColorStop(1, 'transparent');
-    bgX.strokeStyle = shimmerGrad;
-    bgX.lineWidth = s.width;
+  // Caustic light rays from surface
+  rays.forEach(ray => {
+    ray.x += ray.speed;
+    if (ray.x > 1.1) ray.x = -0.1;
+    if (ray.x < -0.1) ray.x = 1.1;
+    const cx = ray.x * w;
+    const hw = ray.width * w;
+    const rayGrad = bgX.createLinearGradient(0, 0, 0, h * 0.7);
+    rayGrad.addColorStop(0,   `rgba(100,210,255,${ray.a})`);
+    rayGrad.addColorStop(0.5, `rgba(60,170,220,${ray.a * 0.5})`);
+    rayGrad.addColorStop(1,   'rgba(0,80,160,0)');
     bgX.beginPath();
-    bgX.moveTo(-s.len * w * 0.5, 0);
-    bgX.lineTo(s.len * w * 0.5, 0);
-    bgX.stroke();
-    bgX.restore();
-  });
-
-  // Animated wave layers
-  waveLayers.forEach(layer => {
-    const baseY = layer.yF * h;
-    const offset = bgT * layer.speed * w * 0.01;
-    bgX.beginPath();
-    bgX.moveTo(0, h);
-    // trace the wave top
-    for (let x = 0; x <= w + 4; x += 4) {
-      const y = baseY + Math.sin((x + offset) * layer.period * Math.PI * 2) * layer.amp
-               + Math.sin((x * 0.7 + offset * 1.3) * layer.period * Math.PI * 2) * layer.amp * 0.4;
-      if (x === 0) bgX.moveTo(x, y);
-      else bgX.lineTo(x, y);
-    }
-    bgX.lineTo(w, h);
-    bgX.lineTo(0, h);
+    bgX.moveTo(cx - hw * 0.3, 0);
+    bgX.lineTo(cx + hw * 0.3, 0);
+    bgX.lineTo(cx + hw, h * 0.72);
+    bgX.lineTo(cx - hw, h * 0.72);
     bgX.closePath();
-    bgX.fillStyle = layer.color;
+    bgX.fillStyle = rayGrad;
     bgX.fill();
   });
 
-  // Surface highlight — lighter band at the very top
-  const surfaceGlow = bgX.createLinearGradient(0, 0, 0, h * 0.22);
-  surfaceGlow.addColorStop(0, 'rgba(0,120,200,0.18)');
-  surfaceGlow.addColorStop(1, 'transparent');
-  bgX.fillStyle = surfaceGlow;
-  bgX.fillRect(0, 0, w, h * 0.22);
+  // Surface shimmer at top
+  const surf = bgX.createLinearGradient(0, 0, 0, h * 0.18);
+  surf.addColorStop(0, 'rgba(80,200,255,0.22)');
+  surf.addColorStop(1, 'transparent');
+  bgX.fillStyle = surf;
+  bgX.fillRect(0, 0, w, h * 0.18);
+
+  // Wavy surface line
+  bgX.beginPath();
+  for (let x = 0; x <= w; x += 3) {
+    const y = h * 0.04 + Math.sin((x * 0.018) + bgT * 0.04) * 6
+                       + Math.sin((x * 0.009) + bgT * 0.025) * 10;
+    x === 0 ? bgX.moveTo(x, y) : bgX.lineTo(x, y);
+  }
+  bgX.strokeStyle = 'rgba(140,230,255,0.18)';
+  bgX.lineWidth = 1.5;
+  bgX.stroke();
+
+  // Plankton particles
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.y < -0.02) p.y = 1.02;
+    if (p.x < 0) p.x = 1; if (p.x > 1) p.x = 0;
+    bgX.beginPath();
+    bgX.arc(p.x * w, p.y * h, p.r, 0, Math.PI * 2);
+    bgX.fillStyle = `rgba(180,230,255,${p.a})`;
+    bgX.fill();
+  });
+
+  // Bubbles
+  bubbles.forEach(b => {
+    b.y -= b.speed;
+    b.wobbleT += b.wobble;
+    if (b.y < -0.02) { b.y = 1.02; b.x = Math.random(); }
+    const bx = (b.x + Math.sin(b.wobbleT) * 0.012) * w;
+    bgX.beginPath();
+    bgX.arc(bx, b.y * h, b.r, 0, Math.PI * 2);
+    bgX.strokeStyle = `rgba(180,230,255,${b.a})`;
+    bgX.lineWidth = 0.8;
+    bgX.stroke();
+    // tiny highlight
+    bgX.beginPath();
+    bgX.arc(bx - b.r * 0.3, b.y * h - b.r * 0.3, b.r * 0.25, 0, Math.PI * 2);
+    bgX.fillStyle = `rgba(255,255,255,${b.a * 0.6})`;
+    bgX.fill();
+  });
+
+  // Fish
+  fishes.forEach(f => {
+    f.x += f.speed;
+    f.tailT += f.tailSpeed;
+    f.wobbleT += f.wobble;
+    if (f.dir === 1 && f.x > 1 + f.size * 3 / bgC.width)  { Object.assign(f, makeFish()); f.dir = 1;  f.x = -f.size * 3 / bgC.width; }
+    if (f.dir === -1 && f.x < -f.size * 3 / bgC.width) { Object.assign(f, makeFish()); f.dir = -1; f.x = 1 + f.size * 3 / bgC.width; }
+    drawFish(bgX, f, bgC.width, bgC.height);
+  });
 
   bgT += 1;
   requestAnimationFrame(drawBg);
